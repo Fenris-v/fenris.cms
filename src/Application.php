@@ -2,6 +2,11 @@
 
 namespace App;
 
+/**
+ * Основной класс для запуска приложения
+ * Class Application
+ * @package App
+ */
 class Application
 {
     private Router $route;
@@ -11,8 +16,17 @@ class Application
         $this->route = $route;
     }
 
-    public function run()
+    /**
+     * Запуск приложения
+     */
+    public function run(): void
     {
-        $this->route->dispatch();
+        $dispatch = $this->route->dispatch();
+
+        if ($dispatch instanceof Renderable) {
+            $dispatch->render($dispatch->string);
+        } else {
+            echo $dispatch;
+        }
     }
 }

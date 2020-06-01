@@ -1,15 +1,31 @@
 <?php
 
+/**
+ * На данный момент нигде не применяется
+ */
 namespace App;
 
+/**
+ * Отсюда вызываются нужные для роутинга методы
+ * Class Controller
+ * @package App
+ */
 class Controller
 {
-    public function index()
+    /**
+     * Выводит главную страницу
+     * @return string
+     */
+    public function index(): string
     {
         return 'home';
     }
 
-    public function about()
+    /**
+     * Выводит страницу about
+     * @return string
+     */
+    public function about(): string
     {
         return 'about';
     }
