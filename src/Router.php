@@ -2,6 +2,8 @@
 
 namespace App;
 
+use App\Exception\NotFoundException;
+
 /**
  * Основной класс роутинга
  * Class Router
@@ -43,6 +45,6 @@ class Router
             }
         }
 
-        return $this->routes['/']();
+        throw new NotFoundException('Не найден нужный путь', 404);
     }
 }

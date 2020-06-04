@@ -2,6 +2,8 @@
 
 namespace App;
 
+use Exception;
+
 /**
  * Основной класс для запуска приложения
  * Class Application
@@ -21,12 +23,26 @@ class Application
      */
     public function run(): void
     {
-        $dispatch = $this->route->dispatch();
+        try {
+            $dispatch = $this->route->dispatch();
 
-        if ($dispatch instanceof Renderable) {
-            $dispatch->render($dispatch->path);
+            if ($dispatch instanceof Renderable) {
+                $dispatch->render($dispatch->path);
+            } else {
+                echo $dispatch;
+            }
+        } catch (Exception $exception) {
+            $this->renderException($exception);
+        }
+    }
+
+    private function renderException(Exception $exception)
+    {
+        if ($exception instanceof Renderable) {
+            $exception->render();
         } else {
-            echo $dispatch;
+            $code = $exception->getCode() !== 0 ?? 500;
+            echo $code . ' ' . $exception->getMessage();
         }
     }
 }

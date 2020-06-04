@@ -18,12 +18,8 @@ class View implements Renderable
     // Понимаю, что плохой подход, но не вижу другого решения пока что
     public function __construct(string $string = '', array $config = [])
     {
-        if ($string !== '' && !empty($config)) {
-            $this->path = $string;
-            $this->config = $config;
-        } else {
-            return;
-        }
+        $this->path = $string;
+        $this->config = $config;
     }
 
     /**
