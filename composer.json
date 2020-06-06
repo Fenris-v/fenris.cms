@@ -1,0 +1,17 @@
+{
+    "name": "fenris/fenris.cms",
+    "authors": [
+        {
+            "name": "fenris",
+            "email": "anatolijv236@gmail.com"
+        }
+    ],
+    "require": {
+        "illuminate/database": "7.14.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    }
+}

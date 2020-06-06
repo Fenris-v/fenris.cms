@@ -2,6 +2,8 @@
 
 namespace App;
 
+use Illuminate\Database\Capsule\Manager;
+
 /**
  * Основной класс для запуска приложения
  * Class Application
@@ -14,6 +16,7 @@ class Application
     public function __construct($route)
     {
         $this->route = $route;
+        $this->initialize();
     }
 
     /**
@@ -28,5 +31,26 @@ class Application
         } else {
             echo $dispatch;
         }
+    }
+
+    private function initialize()
+    {
+        $capsule = new Manager();
+
+        $capsule->addConnection(
+            [
+                'driver' => 'mysql',
+                'host' => Config::getInstance()->get('db.host'),
+                'database' => Config::getInstance()->get('db.dbName'),
+                'username' => Config::getInstance()->get('db.user'),
+                'password' => Config::getInstance()->get('db.password'),
+                'charset' => 'utf8',
+                'collation' => 'utf8_unicode_ci',
+                'prefix' => ''
+            ]
+        );
+
+        $capsule->setAsGlobal();
+        $capsule->bootEloquent();
     }
 }

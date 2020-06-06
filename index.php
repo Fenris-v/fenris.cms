@@ -1,7 +1,7 @@
 <?php
 
 use App\Application;
-use App\Controller;
+use App\Config;
 use App\Router;
 use App\View;
 
@@ -34,3 +34,9 @@ $application = new Application($router);
 
 // Запускаем приложение
 $application->run();
+
+//TODO:
+// Вопрос по безопасности
+// Мы можем таким простым способом получить данные от БД. Как их защитить?
+// Хэшировать пароль, как делали в первой части?
+var_dump(Config::getInstance()->get('db.password'));
