@@ -14,9 +14,7 @@ class View implements Renderable
     public string $path;
     private array $config;
 
-    // Здесь делаю аргументы необязательными, чтобы была возможность создать экземпляр класса в хэдере
-    // Понимаю, что плохой подход, но не вижу другого решения пока что
-    public function __construct(string $string = '', array $config = [])
+    public function __construct(string $string, array $config)
     {
         $this->path = $string;
         $this->config = $config;

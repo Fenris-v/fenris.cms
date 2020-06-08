@@ -2,8 +2,8 @@
 
 namespace App;
 
-use Illuminate\Database\Capsule\Manager;
 use Exception;
+use Illuminate\Database\Capsule\Manager;
 
 /**
  * Основной класс для запуска приложения
@@ -38,20 +38,23 @@ class Application
         }
     }
 
+    /**
+     * Инициализируем подключение к БД
+     */
     private function initialize()
     {
         $capsule = new Manager();
 
         $capsule->addConnection(
             [
-                'driver' => 'mysql',
+                'driver' => Config::getInstance()->get('db.driver'),
                 'host' => Config::getInstance()->get('db.host'),
                 'database' => Config::getInstance()->get('db.dbName'),
                 'username' => Config::getInstance()->get('db.user'),
                 'password' => Config::getInstance()->get('db.password'),
-                'charset' => 'utf8',
-                'collation' => 'utf8_unicode_ci',
-                'prefix' => ''
+                'charset' => Config::getInstance()->get('db.charset'),
+                'collation' => Config::getInstance()->get('db.collation'),
+                'prefix' => Config::getInstance()->get('db.prefix')
             ]
         );
 
@@ -59,9 +62,14 @@ class Application
         $capsule->bootEloquent();
     }
 
+    /**
+     * Вызывается, если не найдена нужная страница
+     * @param Exception $exception
+     */
     private function renderException(Exception $exception)
     {
         if ($exception instanceof Renderable) {
+            /** @noinspection PhpParamsInspection */
             $exception->render();
         } else {
             $code = $exception->getCode() !== 0 ?? 500;

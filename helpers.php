@@ -7,7 +7,7 @@
  * @param array $array - массив из которого нужно получить значение
  * @param string $key - строка типа 'db.mysql.host', где каждое значение равно ключу, а точка указывает на вложенность
  * @param string|null $default - значение по умолчанию, будет возвращено, если в массиве не будет соответствующего ключа
- * @return array|mixed|string|null - значение массива с соответствующим ключем или значение по умолчанию, если первое не найдено
+ * @return mixed|null - значение массива с соответствующим ключом или значение по умолчанию, если первое не найдено
  */
 function array_get(array $array, string $key, string $default = null)
 {
@@ -44,7 +44,6 @@ function includeView(string $templateName, array $data = [])
             throw new Exception('Не найден шаблон ' . $templateName, 404);
         }
     } else {
-        // TODO: change on not found
         throw new Exception('В качетсве названия шаблона передана пустая строка', 404);
     }
 }

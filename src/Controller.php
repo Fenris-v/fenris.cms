@@ -3,6 +3,7 @@
 /**
  * На данный момент нигде не применяется
  */
+
 namespace App;
 
 /**
@@ -18,15 +19,41 @@ class Controller
      */
     public function index(): string
     {
-        return 'home';
+        return function () {
+            return new View\View('index', ['title' => 'Index Page']);
+        };
     }
 
     /**
      * Выводит страницу about
      * @return string
      */
-    public function about(): string
+    public function about()
     {
-        return 'about';
+        return function () {
+            return new View\View('about.about', ['title' => 'About Page']);
+        };
+    }
+
+    /**
+     * Выводит страницу about
+     * @return string
+     */
+    public function news()
+    {
+        return function () {
+            return new View\View('news.news', ['title' => 'News Page']);
+        };
+    }
+
+    /**
+     * Выводит страницу about
+     * @return string
+     */
+    public function books()
+    {
+        return function () {
+            return new View\View('news.news', ['title' => 'News Page']);
+        };
     }
 }

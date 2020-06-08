@@ -11,40 +11,56 @@ use App\Exception\NotFoundException;
  */
 class Router
 {
-    // Массив для хранения доступных путей
+    /** Массив для хранения доступных путей */
     private array $routes = [];
 
     /**
-     * Метод для регистрации доступных пеутей и записи их в массив
-     * @param $url - ключ -> ссылка на страницу
-     * @param $view - значение -> функция или строка
+     * Добавляем пути для GET
+     * @param string $route - адрес страницы
+     * @param $callback - callback
      */
-    public function get($url, $view): void
+    public function get(string $route, $callback): void
     {
-        if (gettype($view) === 'string') {
-            list($class, $method) = explode('@', $view);
-            $this->routes[$url] = ['class' => $class, 'method' => $method];
-        } else {
-            $this->routes[$url] = $view;
-        }
+        $this->add('get', $route, $callback);
     }
 
     /**
-     * Отвечает за запуск правильной $view в соответствии с текущим uri
-     * Здесь в else при выполнении анонимной функции заполняется статичный массив $configs класса View
+     * Добавляем пути для POST
+     * @param string $route - адрес страницы
+     * @param $callback - callback
      */
-    public function dispatch()
+    public function post(string $route, $callback): void
     {
-        if (array_key_exists($_SERVER['REQUEST_URI'], $this->routes)) {
-            if (is_array($this->routes[$_SERVER['REQUEST_URI']])) {
-                $class = new $this->routes[$_SERVER['REQUEST_URI']]['class']();
-                $method = $this->routes[$_SERVER['REQUEST_URI']]['method'];
-                return $class->$method();
-            } else {
-                return $this->routes[$_SERVER['REQUEST_URI']]();
+        $this->add('post', $route, $callback);
+    }
+
+    /**
+     * Отвечает за запуск метода Route->run()
+     * @param string $method - GET/POST
+     * @throws NotFoundException - если не найден соответствующий зарегистрированный адрес
+     */
+    public function dispatch(string $method = 'GET')
+    {
+        $url = '/' . trim($_SERVER['REQUEST_URI'], '/');
+        $method = strtolower($method);
+
+        foreach ($this->routes as $route) {
+            if ($route->match($method, $url)) {
+                return $route->run($url);
             }
         }
 
         throw new NotFoundException('Не найден нужный путь', 404);
+    }
+
+    /**
+     * Метод для регистрации доступных путей и записи их в массив
+     * @param string $method - GET/POST
+     * @param string $path - ключ -> ссылка на страницу
+     * @param $callback - callback
+     */
+    private function add(string $method, string $path, $callback): void
+    {
+        $this->routes[] = new Route($method, $path, $callback);
     }
 }
