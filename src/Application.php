@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Capsule\Manager;
+use Exception;
 
 /**
  * Основной класс для запуска приложения
@@ -24,12 +25,16 @@ class Application
      */
     public function run(): void
     {
-        $dispatch = $this->route->dispatch();
+        try {
+            $dispatch = $this->route->dispatch();
 
-        if ($dispatch instanceof Renderable) {
-            $dispatch->render($dispatch->path);
-        } else {
-            echo $dispatch;
+            if ($dispatch instanceof Renderable) {
+                $dispatch->render($dispatch->path);
+            } else {
+                echo $dispatch;
+            }
+        } catch (Exception $exception) {
+            $this->renderException($exception);
         }
     }
 
@@ -52,5 +57,15 @@ class Application
 
         $capsule->setAsGlobal();
         $capsule->bootEloquent();
+    }
+
+    private function renderException(Exception $exception)
+    {
+        if ($exception instanceof Renderable) {
+            $exception->render();
+        } else {
+            $code = $exception->getCode() !== 0 ?? 500;
+            echo $code . ' ' . $exception->getMessage();
+        }
     }
 }
