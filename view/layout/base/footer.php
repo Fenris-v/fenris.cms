@@ -1,8 +1,26 @@
-    <footer>
-        FOOTER
-    </footer>
-    <script src="<?= JS_CMS_DIR . 'jquery-3.5.1.min.js' ?>" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="<?= JS_CMS_DIR . 'popper.min.js' ?>" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-    <script src="<?= JS_CMS_DIR . 'bootstrap.min.js' ?>" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+<footer class="bg-yellow py-3 mt-auto">
+    <div class="container">
+        <div class="footer row d-flex align-items-center">
+            <div class="col-6 copyright">
+                &copy; Developed by Fenris.
+                <?= date('Y') == 2020 ? 2020 : 2020 . '-' . date('Y'); ?>
+            </div>
+            <div class="col-6 d-flex justify-content-end social-links align-items-center">
+                <p>Follow us:</p>
+                <ul>
+                    <li class="mx-2">
+                        <a class="d-flex" href="https://github.com/Fenris-v" target="_blank" rel="noreferrer noopener">
+                            <i class="fab fa-github-square"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="/templates/js/jquery-3.5.1.min.js"></script>
+<script src="/templates/js/popper.min.js"></script>
+<script src="/templates/js/bootstrap.min.js"></script>
 </body>
 </html>

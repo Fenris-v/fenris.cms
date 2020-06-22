@@ -1,2 +1,4 @@
 /vendor/
 /composer.phar
+/templates/css/.sass-cache/
+/templates/css/fontawesome/
