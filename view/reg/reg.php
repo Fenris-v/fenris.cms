@@ -1,6 +1,10 @@
 <?php
 /** @noinspection PhpUndefinedVariableInspection */
-includeView('layout.head', ['title' => $title]); ?>
+try {
+    includeView('layout.head', ['title' => $title]);
+} catch (Exception $e) {
+    echo $exception->getMessage() . ' ' . $exception->getCode();
+} ?>
 
 <div class="auth-bg">
     <img id="auth-bg" src="/templates/images/bg.jpg" alt="background">
@@ -9,7 +13,7 @@ includeView('layout.head', ['title' => $title]); ?>
 
 <form class="form-signin m-auto p-4">
     <img class="mb-4" src="/templates/images/logo.jpeg" alt="logo">
-    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+    <h1 class="h3 mb-3 font-weight-normal">Sign up</h1>
     <label for="inputEmail" class="sr-only">Email address</label>
     <input type="email" id="inputEmail" class="form-control mb-2" placeholder="Email address" required="" autofocus="">
     <label for="inputPassword" class="sr-only">Password</label>
@@ -19,7 +23,8 @@ includeView('layout.head', ['title' => $title]); ?>
             <input type="checkbox" value="remember-me"> Remember me
         </label>
     </div>
-    <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Sign up</button>
+    <a href="/auth" class="signLink">Sign in</a>
 </form>
 
 <script src="/templates/js/jquery-3.5.1.min.js"></script>

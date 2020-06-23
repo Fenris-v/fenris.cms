@@ -551,6 +551,11 @@ footer {
     -webkit-transform: translateX(-50%);
     transform: translateX(-50%); }
 
+.signLink {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center; }
+
 @font-face {
   font-family: roboto;
   src: url(/templates/fonts/Roboto-Regular.ttf); }

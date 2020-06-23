@@ -39,7 +39,7 @@ class Application
     }
 
     /**
-     * Инициализируем подключение к БД
+     * Инициализирует подключение к БД
      */
     private function initialize()
     {

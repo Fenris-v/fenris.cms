@@ -3,12 +3,17 @@
 use App\Application;
 use App\Controller;
 use App\Router;
+use App\Session;
 
 error_reporting(E_ALL);
 ini_set('display_errors', true);
 
 /** Подключаем скрипт, который будет подключать другие файлы */
 require_once $_SERVER['DOCUMENT_ROOT'] . '/bootstrap.php';
+
+/** Создаем экземпляр сессии и запускаем ее */
+$session = new Session();
+$session->start();
 
 /** Создаем экземпляр роутера */
 $router = new Router();

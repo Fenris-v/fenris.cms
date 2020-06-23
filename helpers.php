@@ -31,6 +31,7 @@ function array_get(array $array, string $key, string $default = null)
  * Функция для подключения частей шаблона
  * @param $templateName - имя шаблона
  * @param $data - передаваемые параметры
+ * @throws Exception
  */
 function includeView(string $templateName, array $data = [])
 {
@@ -46,4 +47,12 @@ function includeView(string $templateName, array $data = [])
     } else {
         throw new Exception('В качетсве названия шаблона передана пустая строка', 404);
     }
+}
+
+/**
+ * Выполняет редирект на главную
+ */
+function redirectOnMain()
+{
+    header('location: /');
 }

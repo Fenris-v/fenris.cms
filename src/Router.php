@@ -15,7 +15,7 @@ class Router
     private array $routes = [];
 
     /**
-     * Добавляем пути для GET
+     * Добавляет пути для GET
      * @param string $route - адрес страницы
      * @param $callback - callback
      */
@@ -25,7 +25,7 @@ class Router
     }
 
     /**
-     * Добавляем пути для POST
+     * Добавляет пути для POST
      * @param string $route - адрес страницы
      * @param $callback - callback
      */
