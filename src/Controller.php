@@ -88,8 +88,8 @@ class Controller
      */
     public function auth(): callable
     {
-        return function () {
-            return new View\View('auth.auth', ['title' => 'Authorization']);
+        return function ($param = '') {
+            return new View\View('auth.auth', ['title' => 'Authorization', 'param' => $param]);
         };
     }
 

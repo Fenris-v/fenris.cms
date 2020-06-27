@@ -1,5 +1,7 @@
 <?php
 
+//TODO: set category
+
 try {
     /** @noinspection PhpUndefinedVariableInspection */
     includeView('layout.header', ['title' => $title]);

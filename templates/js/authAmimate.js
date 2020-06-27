@@ -1,4 +1,4 @@
-$(document).ready(function () {
+$(document).ready(() => {
     /**
      * PARALLAX
      */
@@ -14,7 +14,7 @@ $(document).ready(function () {
         });
     }
 
-    parallaxBox.mousemove(function (e) {
+    parallaxBox.on('mousemove', (e) => {
         if (window.innerWidth > 1000) {
             parallaxIt(e, '#sun', 200, 100);
         }

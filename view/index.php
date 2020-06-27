@@ -1,7 +1,5 @@
 <?php
 
-use App\Model\Article;
-
 try {
     /** @noinspection PhpUndefinedVariableInspection */
     includeView('layout.header', ['title' => $title]);

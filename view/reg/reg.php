@@ -1,6 +1,21 @@
 <?php
-/** @noinspection PhpUndefinedVariableInspection */
+
+use App\Model\User;
+
+/** Создаем экземпляр пользователя */
+$user = new User();
+
+if (isset($_POST['new_code']) && $_POST['new_code'] !== '') {
+    $user->newCode();
+    redirectOnPage($_SERVER['REQUEST_URI']);
+} elseif (isset($_POST['secret'])) {
+    $error = $user->checkCode();
+} elseif (isset($_POST['email']) && isset($_POST['password']) && isset($_POST['username'])) {
+    $error = $user->registration();
+}
+
 try {
+    /** @noinspection PhpUndefinedVariableInspection */
     includeView('layout.head', ['title' => $title]);
 } catch (Exception $e) {
     echo $exception->getMessage() . ' ' . $exception->getCode();
@@ -11,20 +26,45 @@ try {
     <img id="sun" src="/templates/images/sun.png" alt="sun">
 </div>
 
-<form class="form-signin m-auto p-4">
+<form class="form-signin m-auto p-4" method="post">
     <img class="mb-4" src="/templates/images/logo.jpeg" alt="logo">
-    <h1 class="h3 mb-3 font-weight-normal">Sign up</h1>
-    <label for="inputEmail" class="sr-only">Email address</label>
-    <input type="email" id="inputEmail" class="form-control mb-2" placeholder="Email address" required="" autofocus="">
-    <label for="inputPassword" class="sr-only">Password</label>
-    <input type="password" id="inputPassword" class="form-control mb-2" placeholder="Password" required="">
-    <div class="checkbox mb-3">
-        <label>
-            <input type="checkbox" value="remember-me"> Remember me
-        </label>
-    </div>
-    <button class="btn btn-lg btn-primary btn-block" type="submit">Sign up</button>
-    <a href="/auth" class="signLink">Sign in</a>
+    <h1 class="h3 mb-3 font-weight-normal">Зарегистрироваться</h1>
+    <?php
+    if (isset($_SESSION['final_reg']) && $_SESSION['final_reg'] === 'success'): ?>
+        <p>Пользователь успешно создан! Вы будете автоматически перенаправлены на главную страницу через 5 секунд.</p>
+    <?php
+    elseif (
+        isset($_SESSION['secret_code']) &&
+        isset($_SESSION['secret_code_time']) &&
+        $_SESSION['secret_code'] &&
+        isSessionLive()
+    ): ?>
+        <label for="secret" class="sr-only">Код из письма</label>
+        <input name="secret" type="text" id="secret" class="form-control" placeholder="Код из письма"
+               autofocus="">
+        <span class="text-danger"><?= isset($error) && !isset($_POST['new_code']) ? $error : '' ?></span>
+        <button class="btn btn-lg btn-primary btn-block mt-2" type="submit">Подтвердить</button>
+        <button name="new_code" class="btn btn-lg btn-secondary btn-block mt-2" type="submit">Новый код</button>
+    <?php
+    else: ?>
+        <label for="inputEmail" class="sr-only">Email</label>
+        <input name="email" type="email" id="inputEmail" class="form-control" placeholder="Email" required=""
+               autofocus="" value="<?= $_POST['email'] ?? '' ?>">
+        <span class="text-danger"><?= $error['mail'] ?? '' ?></span>
+        <label for="inputPassword" class="sr-only">Логин</label>
+        <input name="username" type="text" id="inputLogin" class="form-control mt-2" placeholder="Логин" required=""
+               value="<?= $_POST['username'] ?? '' ?>">
+        <span class="text-danger"><?= $error['login'] ?? '' ?></span>
+        <label for="inputLogin" class="sr-only">Пароль</label>
+        <input name="password" type="password" id="inputPassword" class="form-control mt-2" placeholder="Пароль"
+               required="" value="<?= $_POST['password'] ?? '' ?>">
+        <span class="text-danger"><?= $error['password'] ?? '' ?></span>
+        <button class="btn btn-lg btn-primary btn-block mt-2" type="submit">Зарегистрироваться</button>
+        <!--suppress HtmlUnknownTarget -->
+        <a href="/auth" class="signLink">Авторизоваться</a>
+    <?php
+    endif; ?>
+    <a href="/" class="signLink">Вернуться на главную</a>
 </form>
 
 <script src="/templates/js/jquery-3.5.1.min.js"></script>
@@ -32,5 +72,17 @@ try {
 <script src="/templates/js/bootstrap.min.js"></script>
 <script src="/templates/js/gsap.min.js"></script>
 <script src="/templates/js/authAmimate.js"></script>
-</body>
-</html>
+
+<?php
+if (isset($_SESSION['final_reg']) && $_SESSION['final_reg'] === 'success'):
+    unset($_SESSION['final_reg']); ?>
+    <script>
+        $(document).ready(() => {
+            setTimeout(
+                () => {
+                    document.location.href = '/'
+                }, 5000);
+        });
+    </script>
+<?php
+endif; ?>

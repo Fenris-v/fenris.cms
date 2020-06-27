@@ -20,7 +20,10 @@
                     </svg>
                 </a>
 
-                <a class="btn btn-primary" href="/auth">Войти</a>
+                <a class="btn btn-primary"
+                   href="<?= isset($_SESSION['login']) ? '?logout' : '/auth' ?>">
+                    <?= isset($_SESSION['login']) ? 'Выйти' : 'Войти' ?>
+                </a>
             </div>
         </div>
 

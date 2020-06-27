@@ -7,6 +7,9 @@
           <mappings>
             <mapping deploy="/www/fenris.cms" local="$PROJECT_DIR$" web="/" />
           </mappings>
+          <excludedPaths>
+            <excludedPath path="/www/fenris.cms/templates/css/fontawesome" />
+          </excludedPaths>
         </serverdata>
       </paths>
     </serverData>

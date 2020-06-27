@@ -2,36 +2,299 @@
 
 namespace App\Model;
 
+use App\Mail;
 use App\Session;
 use Illuminate\Database\Eloquent\Model;
 
 final class User extends Model
 {
+    protected $fillable = ['password_token', 'password', 'mail', 'role_id', 'updated_at'];
+
     /**
      * Выполняет вход в аккаунт
      */
-    public function signIn(): void
+    public function auth(): ?string
     {
         if ($this->verifyAuthData()) {
-            if ($this->loginType() === 'mail') {
-                (new Session())->set(
-                    'login',
-                    $this::all()
-                        ->where($this->loginType(), $_POST['username'])
-                        ->first()
-                        ->login
-                );
+            $login = $this->loginType() === 'login'
+                ? $_POST['username']
+                : $this::all()
+                    ->where($this->loginType(), $_POST['username'])
+                    ->first()
+                    ->login;
+
+            (new Session())->set('login', $login);
+
+            if (isset($_POST['remember'])) {
+                $this->remember($login, $_POST['password']);
             } else {
-                (new Session())->set('login', $_POST['username']);
+                setcookie('password_token', '', time() - 3600);
+                $this->removeToken($login);
             }
 
-            redirectOnMain();
+            redirectOnPage();
+            return null;
+        } else {
+            return 'Не правильный логин или пароль';
         }
     }
 
-    // TODO: Реализовать запоминание аккаунта
-    public function remember(): void
+    /**
+     * Быстрый вход (когда был выбран чекбокс "запомнить меня")
+     */
+    public function fastAuth(): void
     {
+        $user = $this::all()
+            ->where('password_token', $_COOKIE['password_token'])
+            ->first();
+
+        if (!isset($user)) {
+            setcookie('password_token', '', time() - 3600, '/');
+            return;
+        }
+
+        $_SESSION['login'] = $user->login;
+    }
+
+    /**
+     * Регистрирует пользователя
+     * @return array|null
+     */
+    public function registration(): ?array
+    {
+        $error = [];
+
+        $mail = $this->checkMail($_POST['email']);
+        if ($mail) {
+            $error['mail'] = $mail;
+        }
+
+        $login = $this->checkLogin($_POST['username']);
+        if ($login) {
+            $error['login'] = $login;
+        }
+
+        $password = $this->checkPassword($_POST['password']);
+        if ($password) {
+            $error['password'] = $password;
+        }
+
+        if (!empty($error)) {
+            return $error;
+        }
+
+        if (!isset($_SESSION['secret_code']) || !isSessionLive()) {
+            $this->writeCode($_POST['email'], $_POST['username']);
+        }
+
+        $_SESSION['mail'] = $_POST['email'];
+        $_SESSION['login'] = $_POST['username'];
+        $_SESSION['password'] = $_POST['password'];
+
+        return null;
+    }
+
+    /**
+     * Генерирует и отправляет новый код
+     */
+    public function newCode()
+    {
+        if (isset($_SESSION['mail']) && $_SESSION['login']) {
+            $this->writeCode($_SESSION['mail'], $_SESSION['login']);
+        } else {
+            $this->writeCode(
+                $_SESSION['forgetting_user'],
+                $this::all()
+                    ->where('mail', $_SESSION['forgetting_user'])
+                    ->first()
+                    ->login
+            );
+        }
+    }
+
+    /**
+     * Проверяет код из письма
+     * @return string|null - текст ошибки
+     */
+    public function checkCode(): ?string
+    {
+        if (isset($_SESSION['secret_code']) && isset($_SESSION['secret_code_time'])) {
+            if (!isSessionLive()) {
+                return 'Время действия кода истекло';
+            } elseif ($_SESSION['secret_code'] !== $_POST['secret']) {
+                return 'Не правильный код';
+            }
+            $this->create();
+        }
+
+        return null;
+    }
+
+    /**
+     * Проверяет есть ли такой пользователь и отправляет письмо с кодом для восстановления пароля
+     * @return string|null - ошибки
+     */
+    public function forgetPassword(): ?string
+    {
+        $user = $this::all()
+            ->where($this->loginType(), $_POST['username'])
+            ->first();
+        if ($user) {
+            $this->writeCode($user->mail, $user->login);
+            $_SESSION['forgetting_user'] = $user->mail;
+            return null;
+        }
+
+        return 'Не найден такой пользователь';
+    }
+
+    /**
+     * Сбрасывает пароль
+     * @return string|null - сообщения
+     */
+    public function resetPassword(): ?string
+    {
+        $password = $this->checkPassword($_POST['new_password']);
+        if ($password === null) {
+            $user = $this::all()
+                ->where('mail', $_SESSION['forgetting_user'])
+                ->first();
+
+            $user->update(['password' => password_hash($_POST['new_password'], PASSWORD_DEFAULT)]);
+
+            session_destroy();
+            session_start();
+
+            $_SESSION['password_reset'] = 'success';
+
+            $_POST['test'] = 'test';
+
+            redirectOnPage('/auth');
+
+            unset($_SESSION['forgetting_user']);
+        }
+
+        return $password;
+    }
+
+    /**
+     * Отправляет письмо с кодом на почту и пишет его в сессию
+     * @param $to - почта, на которую отправляется код
+     * @param $user - имя пользователя
+     */
+    private function writeCode($to, $user)
+    {
+        $mail = new Mail();
+        $code = $mail->generateSecretCode();
+        $msg = $mail->textForSecretCodeMsg($user, $code);
+        $mail->sendMail($to, 'Подтверждение почты', $msg, NO_REPLY_MAIL);
+
+        $_SESSION['secret_code'] = $code;
+        $_SESSION['secret_code_time'] = time();
+    }
+
+    /**
+     * Создает нового пользователя
+     */
+    private function create(): void
+    {
+        $user = new $this;
+        $user->login = $_SESSION['login'];
+        $user->password = password_hash($_SESSION['password'], PASSWORD_DEFAULT);
+        $user->mail = $_SESSION['mail'];
+        $user->save();
+
+        unset($_SESSION['password']);
+        unset($_SESSION['mail']);
+        unset($_SESSION['secret_code']);
+        unset($_SESSION['secret_code_time']);
+
+        $_SESSION['final_reg'] = 'success';
+    }
+
+    /**
+     * Проверяет почту для регистрации
+     * @param $mail - почта
+     * @return string|null - текст ошибки
+     */
+    private function checkMail($mail): ?string
+    {
+        if (!isset($mail) || empty($mail)) {
+            return 'Введите почту';
+        } elseif (!filter_var($mail)) {
+            return 'Некорректная почта';
+        } elseif ($this::all()->where('mail', trim($mail))->first() !== null) {
+            return 'Указанная почта уже зарегистрирована';
+        }
+
+        return null;
+    }
+
+    /**
+     * Проверяет логин для регистрации
+     * @param $login - логин
+     * @return string|null - текст ошибки
+     */
+    private function checkLogin($login): ?string
+    {
+        if (!isset($login) || empty($login)) {
+            return 'Введите логин';
+        } elseif (strlen($login) < MIN_LOGIN_LENGTH) {
+            return 'Минимальная длина логина - ' . MIN_LOGIN_LENGTH . ' символа';
+        } elseif (!preg_match("/^[A-Za-z0-9\-_]+$/", $login)) {
+            return 'Допустимы только латинские буквы, цифры и символы - и _';
+        } elseif ($this::all()->where('login', trim($_POST['username']))->first() !== null) {
+            return 'Имя уже занято';
+        }
+
+        return null;
+    }
+
+    /**
+     * Проверяет пароль для регистрации
+     * @param $password - пароль
+     * @return string|null - текст ошибки
+     */
+    private function checkPassword($password): ?string
+    {
+        if (!isset($password) || empty($password)) {
+            return 'Введите пароль';
+        } elseif (strlen($password) < MIN_PASSWORD_LENGTH) {
+            return 'Минимальная длина пароля - ' . MIN_PASSWORD_LENGTH . ' символов';
+        } elseif (preg_match('/[а-яё]/iu', $password)) {
+            return 'Использование букв кириллицы в пароле не допускается';
+        }
+
+        return null;
+    }
+
+    /**
+     * "Запомнить меня" - запись токена в БД
+     * @param $login - логин пользователя
+     * @param $password - пароль для создания md5
+     */
+    private function remember($login, $password): void
+    {
+        $password_token = md5($login . $password . time());
+
+        $this::all()
+            ->where('login', $login)
+            ->first()
+            ->update(['password_token' => $password_token]);
+
+        setcookie('password_token', $password_token, time() + (30 * 24 * 60 * 60), '/');
+    }
+
+    /**
+     * Удаляет токен для "запоминания" пользователя из БД
+     * @param $login - логин пользователя, для которого удалить токен
+     */
+    private function removeToken($login): void
+    {
+        $this::all()
+            ->where('login', $login)
+            ->first()
+            ->update(['password_token' => null]);
     }
 
     /**
