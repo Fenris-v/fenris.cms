@@ -6,6 +6,8 @@
 
 namespace App;
 
+use App\Model\Category;
+
 /**
  * Отсюда вызываются нужные для роутинга методы
  * Class Controller
@@ -71,6 +73,8 @@ class Controller
         };
     }
 
+    // TODO: delete post
+
     /**
      * Возвращает callback для страницы post
      * @return callable - callback
@@ -79,6 +83,44 @@ class Controller
     {
         return function ($param) {
             return new View\View('article.article', ['title' => 'Article Page', 'param' => $param]);
+        };
+    }
+
+    /**
+     * Возвращает callback для страницы post
+     * @return callable - callback
+     */
+    public function categories(): callable
+    {
+        return function ($param) {
+            $category = new Category;
+            return new View\View(
+                'category.category',
+                [
+                    'title' => $category->getTitle($_SERVER['REQUEST_URI']),
+                    'metaDescription' => $category->getDescription($_SERVER['REQUEST_URI']),
+                    'param' => $param
+                ]
+            );
+        };
+    }
+
+    /**
+     * Возвращает callback для страницы post
+     * @return callable - callback
+     */
+    public function article(): callable
+    {
+        return function ($params) {
+            // TODO: change view
+            return new View\View('article.article', ['title' => 'Article Page', 'param' => $params]);
+        };
+    }
+
+    public function admin(): callable
+    {
+        return function ($params) {
+            return new View\View('admin.index', ['params' => $params]);
         };
     }
 

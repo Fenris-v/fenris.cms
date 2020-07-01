@@ -138,3 +138,12 @@ function generateUri(string $str): string
 
     return preg_replace('~[^-a-z0-9_]+~u', '-', strtr(mb_strtolower($str), $converter));
 }
+
+function getLayoutName($section, $params): string
+{
+    foreach ($params as $param) {
+        $section .= '.' . $param;
+    }
+
+    return $section;
+}

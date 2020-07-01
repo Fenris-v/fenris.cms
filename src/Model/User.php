@@ -6,9 +6,92 @@ use App\Mail;
 use App\Session;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class User - Singleton
+ * @package App\Model
+ */
 final class User extends Model
 {
+    public static ?User $instance = null;
+    public static ?string $role = null;
     protected $fillable = ['password_token', 'password', 'mail', 'role_id', 'updated_at'];
+
+    /**
+     * Делать класс синглтоном
+     * @return User
+     */
+    public static function getInstance(): User
+    {
+        if (null === static::$instance) {
+            static::$instance = new static();
+        }
+        return static::$instance;
+    }
+
+    /**
+     * Возвращает имя пользователя, если оно пустое - логин
+     * @return string - имя или логин
+     */
+    public function getName(): string
+    {
+        $name = $this::all()
+            ->where('login', $_SESSION['login'])
+            ->first()
+            ->name;
+
+        if ($name !== null && $name) {
+            return $name;
+        }
+
+        return $this::all()
+            ->where('login', $_SESSION['login'])
+            ->first()
+            ->login;
+    }
+
+    public function getRoleName($id): string
+    {
+        return (new Role())->getRoleVisibleName(
+            $this::all()
+                ->where('id', $id)
+                ->first()
+                ->role_id
+        );
+    }
+
+    /**
+     * Проверяет является ли пользователь менеджером
+     * @return bool
+     */
+    public function isManager(): bool
+    {
+        if (static::$role === null) {
+            static::$role = $this->getUserRole();
+        }
+
+        if (static::$role === 'manager') {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Проверяет является ли пользователь администратором
+     * @return bool
+     */
+    public function isSuperUser(): bool
+    {
+        if (static::$role === null) {
+            static::$role = $this->getUserRole();
+        }
+
+        if (static::$role === 'admin') {
+            return true;
+        }
+
+        return false;
+    }
 
     /**
      * Выполняет вход в аккаунт
@@ -16,14 +99,16 @@ final class User extends Model
     public function auth(): ?string
     {
         if ($this->verifyAuthData()) {
+            $user = $this::all()
+                ->where($this->loginType(), $_POST['username'])
+                ->first();
+
             $login = $this->loginType() === 'login'
                 ? $_POST['username']
-                : $this::all()
-                    ->where($this->loginType(), $_POST['username'])
-                    ->first()
-                    ->login;
+                : $user->login;
 
-            (new Session())->set('login', $login);
+            $session = new Session();
+            $session->set('login', $login);
 
             if (isset($_POST['remember'])) {
                 $this->remember($login, $_POST['password']);
@@ -175,6 +260,70 @@ final class User extends Model
         }
 
         return $password;
+    }
+
+    public function setNewData($userId): array
+    {
+        $user = $this::all()->where('id', $userId)->first();
+
+        $error = [];
+
+        if (!filter_var($_POST['mail'], FILTER_VALIDATE_EMAIL)) {
+            $error['mail'] = 'Неверный адрес';
+        } elseif (
+            $user->mail !== trim($_POST['mail']) &&
+            $this::all()->where('mail', trim($_POST['mail']))->first() !== null
+        ) {
+            $error['mail'] = 'Другой пользователь использует данный адрес';
+        }
+
+        if (strlen(trim($_POST['login'])) < 4) {
+            $error['login'] = 'Слишком короткий логин';
+        } elseif (
+            $user->login !== trim($_POST['login']) &&
+            $this::all()->where('login', trim($_POST['login']))->first() !== null
+        ) {
+            $error['login'] = 'Данный логин занят';
+        }
+
+        if (!empty($error)) {
+            return $error;
+        }
+
+        if ($_SESSION['login'] === $user->login) {
+            $_SESSION['login'] = trim($_POST['login']);
+        }
+
+        $user->name = $_POST['name'];
+        $user->mail = $_POST['mail'];
+        $user->role_id = $_POST['role'];
+        $user->subscribe = isset($_POST['subscribe']);
+        $user->login = $_POST['login'];
+
+        $user->save();
+
+        header('Refresh: 0');
+
+        return $error;
+    }
+
+    public function getRoleId(): int
+    {
+        return (int) $this::all()->where('login', $_SESSION['login'])->first()->role_id;
+    }
+
+    /**
+     * Возвращает роль пользователя
+     * @return string
+     */
+    private function getUserRole(): string
+    {
+        return (new Role())->getRoleName(
+            $this::all()
+                ->where('login', $_SESSION['login'])
+                ->first()
+                ->role_id
+        );
     }
 
     /**

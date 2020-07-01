@@ -2,6 +2,7 @@
 
 use App\Application;
 use App\Controller;
+use App\Model\Permission;
 use App\Model\User;
 use App\Router;
 use App\Session;
@@ -11,9 +12,6 @@ ini_set('display_errors', true);
 
 /** Подключаем скрипт, который будет подключать другие файлы */
 require_once $_SERVER['DOCUMENT_ROOT'] . '/bootstrap.php';
-
-/** Создаем пользователя и авторизовываем его, если есть токен */
-$user = new User();
 
 /** Создаем экземпляр сессии и запускаем ее */
 $session = new Session();
@@ -49,23 +47,46 @@ $router->get('/news', $controller->news());
 $router->get('/news/*/news/*', $controller->newsParams());
 $router->post('/news', $controller->news());
 $router->get('/books', $controller->books());
+$router->get('/post/*', $controller->post());
 
 // FOR RELEASE
 $router->get('/', $controller->index());
-$router->get('/post/*', $controller->post());
+//TODO: delete 'post'
+$router->get('/admin/*', $controller->admin());
+$router->get('/admin/*/*', $controller->admin());
 $router->get('/auth', $controller->auth());
 $router->get('/auth/*', $controller->auth());
 $router->get('/registration', $controller->reg());
 $router->get('/profile/*', $controller->profile());
+$router->get('/*', $controller->categories());
+$router->get('/*/*', $controller->article());
 
 /** Создаем экземпляр для запуска приложения */
 $application = new Application($router);
 
 /** Авторизуем пользователя, если есть токен */
 if (!isset($_SESSION['login']) && isset($_COOKIE['password_token']) && !empty($_COOKIE['password_token'])) {
-    $user->fastAuth();
+    User::getInstance()->fastAuth();
+}
+
+if (trim(trim($_SERVER['REQUEST_URI']), '/') === 'admin') {
+    if (isset($_SESSION['login']) && (User::getInstance()->isManager() || User::getInstance()->isSuperUser())) {
+        redirectOnPage('/admin/articles');
+    } elseif (!isset($_SESSION['login'])) {
+        redirectOnPage('/auth');
+    } else {
+        if (isset($_SERVER['HTTP_REFERER'])) {
+            redirectOnPage($_SERVER['HTTP_REFERER']);
+        }
+
+        redirectOnPage();
+    }
+}
+
+/** Определяем роль пользователя */
+if (isset($_SESSION['login'])) {
+    $session->set('role', (new User)->getRoleId());
 }
 
 /** Запускаем приложение */
 $application->run();
-

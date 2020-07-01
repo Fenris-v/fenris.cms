@@ -21,4 +21,4 @@ foreach (Article::all() as $article):
     </div>
 
 <?php
-endforeach; ?>
+endforeach;

@@ -11,5 +11,6 @@ define('LOG_DIR', APP_DIR . '/log/');
 define('MIN_LOGIN_LENGTH', 4);
 define('MIN_PASSWORD_LENGTH', 8);
 define('SECRET_CODE_LIFE', 15);
+define('DEFAULT_ROLE', 3);
 
 define('NO_REPLY_MAIL', 'no-reply@fenris.cms');

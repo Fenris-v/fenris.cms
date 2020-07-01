@@ -2,25 +2,23 @@
 
 use App\Model\User;
 
-/** Создаем экземпляр пользователя */
-$user = new User();
 if (isset($_POST['new_code']) && $_POST['new_code'] === '') {
-    $user->newCode();
+    User::getInstance()->newCode();
     redirectOnPage($_SERVER['REQUEST_URI']);
-} elseif (!empty($_POST) && !isset($param) || !empty($_POST) && $param === '') {
+} elseif (!empty($_POST) && empty($param)) {
     unset($_SESSION['password_reset']);
-    $error = $user->auth();
+    $error = User::getInstance()->auth();
 } elseif (isset($_POST['new_password'])) {
-    $success = $user->resetPassword();
+    $success = User::getInstance()->resetPassword();
 } elseif (
     isset($_POST['forget_submit']) && !isset($_SESSION['secret_code_time']) && !isset($success) ||
     isset($_POST['forget_submit']) && isset($_SESSION['secret_code_time']) && !isSessionLive() && !isset($success)
 ) {
-    $error = $user->forgetPassword();
+    $error = User::getInstance()->forgetPassword();
 }
 
 /** Редирект, если авторизованный пользователь попытается зайти на страницу авторизации */
-if (isset($_SESSION['login'])) {
+if (isset($_SESSION['login']) && isset($_SESSION['role'])) {
     redirectOnPage();
 }
 
@@ -39,10 +37,10 @@ try {
 <form class="form-signin m-auto p-4" method="post">
     <img class="mb-4" src="/templates/images/logo.jpeg" alt="logo">
     <h1 class="h3 mb-3 font-weight-normal text-center">
-        <?= $param ? 'Сброс пароля' : 'Пожалуйста авторизуйтесь' ?>
+        <?= isset($param[0]) ? 'Сброс пароля' : 'Пожалуйста авторизуйтесь' ?>
     </h1>
     <?php
-    if (!isset($param) || !$param): ?>
+    if (empty($param)): ?>
         <span class="text-success">
             <?= isset($_SESSION['password_reset']) ? 'Пароль сброшен' : '' ?>
         </span>
@@ -62,7 +60,7 @@ try {
         <!--suppress HtmlUnknownTarget -->
         <a href="/auth/forget" class="signLink">Забыли пароль?</a>
     <?php
-    elseif ($param && isset($_SESSION['secret_code']) && isset($_POST['reset'])): ?>
+    elseif (isset($param[0]) && isset($_SESSION['secret_code']) && isset($_POST['reset'])): ?>
         <label for="newPassword" class="sr-only">Новый пароль</label>
         <input name="new_password" type="password" id="newPassword" class="form-control" placeholder="Новый пароль"
                required="" autofocus="">
@@ -70,7 +68,7 @@ try {
         <button name="reset" class="btn btn-lg btn-primary btn-block mt-2" type="submit">Сбросить</button>
         <!--suppress HtmlUnknownTarget -->
         <a href="/auth" class="signLink">Авторизоваться</a>  <?php
-    elseif ($param && isset($_SESSION['secret_code']) && isSessionLive() && !isset($success)) : ?>
+    elseif (isset($param[0]) && isset($_SESSION['secret_code']) && isSessionLive() && !isset($success)) : ?>
         <label for="secret" class="sr-only">Код из письма</label>
         <input name="secret" type="text" id="secret" class="form-control" placeholder="Код из письма" autofocus="">
         <span class="text-danger"><?= $error ?? '' ?></span>
@@ -78,7 +76,7 @@ try {
         <button name="new_code" class="btn btn-lg btn-secondary btn-block mt-2" type="submit">Новый код</button>
         <!--suppress HtmlUnknownTarget -->
         <a href="/auth" class="signLink">Авторизоваться</a> <?php
-    elseif ($param): ?>
+    elseif (isset($param[0])): ?>
         <label for="inputEmail" class="sr-only">Email или логин</label>
         <input name="username" type="text" id="inputEmail" class="form-control mb-2" placeholder="Email или логин"
                required="" autofocus="" value="<?= $_POST['username'] ?? '' ?>">

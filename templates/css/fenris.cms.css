@@ -426,9 +426,15 @@ ul, li {
 .bg-yellow {
   background: #fbee17; }
 
+.bg-green {
+  background: #ffff5d; }
+
 .cyber {
   font-family: cyber, sans-serif;
   font-weight: bold; }
+
+.adminLogo {
+  width: 40px; }
 
 h2, h3 {
   padding-top: 30px; }
@@ -555,6 +561,37 @@ footer {
   margin-top: 20px;
   display: flex;
   justify-content: center; }
+
+.topPosts {
+  -moz-transition: all 0.4s ease 0s;
+  -o-transition: all 0.4s ease 0s;
+  -webkit-transition: all 0.4s ease 0s;
+  transition: all 0.4s ease 0s; }
+  .topPosts:hover {
+    -webkit-box-shadow: 0 0 30px rgba(0, 0, 0, 0.3) !important;
+    -moz-box-shadow: 0 0 30px rgba(0, 0, 0, 0.3) !important;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.3) !important;
+    -moz-transition: all 0.4s ease 0s;
+    -o-transition: all 0.4s ease 0s;
+    -webkit-transition: all 0.4s ease 0s;
+    transition: all 0.4s ease 0s; }
+
+.primary {
+  color: #fbee17 !important; }
+
+.adminContainer .row .sidebar {
+  padding-top: 50px;
+  min-height: 100vh; }
+.adminContainer .row main {
+  padding-top: 80px; }
+
+.sidebar .nav-link {
+  color: #333; }
+  .sidebar .nav-link i {
+    margin-right: 20px;
+    font-size: 30px; }
+  .sidebar .nav-link.active {
+    color: #007bff; }
 
 @font-face {
   font-family: roboto;

@@ -1,13 +1,12 @@
 <?php
 
 try {
-    /** @noinspection PhpUndefinedVariableInspection */
-    includeView('layout.head', ['title' => $title]);
+    includeView('layout.head', $data);
 
-    if (isset($isAdmin) && $isAdmin) {
-        includeView('layout.admin_header', ['title' => $title]);
+    if (strpos($_SERVER['REQUEST_URI'], 'admin')) {
+        includeView('layout.admin_header', $data);
     } else {
-        includeView('layout.base.header', ['title' => $title]);
+        includeView('layout.base.header', $data);
     }
 } catch (Exception $exception) {
     echo $exception->getMessage() . ' ' . $exception->getCode();

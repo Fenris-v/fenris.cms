@@ -1,11 +1,11 @@
 <?php
 
-namespace App;
+namespace App\Interfaces;
 
 /**
  * Интерфейс рендеринга объектов
  * Interface Renderable
- * @package App
+ * @package App\Interfaces
  */
 interface Renderable
 {

@@ -73,7 +73,7 @@ class Route
                 $params[] = $urlParts[$key];
             }
         }
-        return call_user_func_array($callback, $params);
+        return call_user_func_array($callback, [$params]);
     }
 
     /**

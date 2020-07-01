@@ -60,10 +60,10 @@ final class Config
     }
 
     /**
-     * Возвращает статический массива с настройками
+     * Возвращает статический массив с настройками
      * @return Config
      */
-    public static function getInstance():?Config
+    public static function getInstance(): Config
     {
         if (null === static::$instance) {
             static::$instance = new static();

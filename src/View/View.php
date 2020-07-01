@@ -2,7 +2,7 @@
 
 namespace App\View;
 
-use App\Renderable;
+use App\Interfaces\Renderable;
 
 /**
  * Отвечает за вывод запрошенного шаблона

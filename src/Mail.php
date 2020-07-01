@@ -2,6 +2,11 @@
 
 namespace App;
 
+/**
+ * Класс для отправки писем
+ * Class Mail
+ * @package App
+ */
 class Mail
 {
     public function sendMail($to, $subject, $message, $from)

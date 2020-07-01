@@ -2,7 +2,7 @@
 
 namespace App\Exception;
 
-use App\Renderable;
+use App\Interfaces\Renderable;
 
 /**
  * Для ошибок связаных с проблемами рендера

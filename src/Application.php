@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Interfaces\Renderable;
 use Exception;
 use Illuminate\Database\Capsule\Manager;
 

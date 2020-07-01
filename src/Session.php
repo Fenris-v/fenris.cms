@@ -2,6 +2,11 @@
 
 namespace App;
 
+/**
+ * Класс сессий
+ * Class Session
+ * @package App
+ */
 final class Session
 {
     /**

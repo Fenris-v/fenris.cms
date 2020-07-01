@@ -2,16 +2,13 @@
 
 use App\Model\User;
 
-/** Создаем экземпляр пользователя */
-$user = new User();
-
-if (isset($_POST['new_code']) && $_POST['new_code'] !== '') {
-    $user->newCode();
+if (isset($_POST['new_code'])) {
+    User::getInstance()->newCode();
     redirectOnPage($_SERVER['REQUEST_URI']);
 } elseif (isset($_POST['secret'])) {
-    $error = $user->checkCode();
+    $error = User::getInstance()->checkCode();
 } elseif (isset($_POST['email']) && isset($_POST['password']) && isset($_POST['username'])) {
-    $error = $user->registration();
+    $error = User::getInstance()->registration();
 }
 
 try {

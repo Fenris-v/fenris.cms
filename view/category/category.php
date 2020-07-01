@@ -2,7 +2,7 @@
 
 try {
     /** @noinspection PhpUndefinedVariableInspection */
-    includeView('layout.header', ['title' => $title]);
+    includeView('layout.header', ['title' => $title, 'description' =>$metaDescription]);
 } catch (Exception $exception) {
     echo $exception->getMessage() . ' ' . $exception->getCode();
 } ?>
