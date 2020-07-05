@@ -7,7 +7,7 @@
                     <a class="d-flex align-items-center nav-link<?php
                     if (strpos($_SERVER['REQUEST_URI'], $page['uri'])) {
                         echo ' active';
-                    } ?>" href="/admin<?= $page['uri'] ?>">
+                    } ?>" href="/admin/<?= $page['uri'] ?>/list">
                         <?= $page['icon'] ?>
                         <?= $page['name'] ?>
                     </a>

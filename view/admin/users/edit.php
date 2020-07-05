@@ -3,14 +3,13 @@
 use App\Model\Role;
 use App\Model\User;
 
-$user = (new User());
+$user = new User();
 
 if (!empty($_POST)) {
-    $id = $user::all()->where('id', $data[1])->first()->id;
-    $error = $user->setNewData($id);
+    $error = $user->setNewData($data[0]);
 }
 
-$user = $user::all()->where('id', $data[1])->first();
+$user = $user::all()->where('id', $data[0])->first();
 ?>
 
 <div class="row">
@@ -23,7 +22,6 @@ $user = $user::all()->where('id', $data[1])->first();
                            type="text"
                            class="form-control"
                            id="name"
-                           aria-describedby="emailHelp"
                            value="<?= $_POST['name'] ?? $user->name ?>">
                 </div>
             </li>
@@ -34,7 +32,6 @@ $user = $user::all()->where('id', $data[1])->first();
                            type="text"
                            class="form-control"
                            id="login"
-                           aria-describedby="emailHelp"
                            required
                            value="<?= $_POST['login'] ?? $user->login ?>">
                     <span class="text-danger"><?= isset($error['login']) ? $error['login'] : '' ?></span>
@@ -47,7 +44,6 @@ $user = $user::all()->where('id', $data[1])->first();
                            type="email"
                            class="form-control"
                            id="mail"
-                           aria-describedby="emailHelp"
                            required
                            value="<?= $_POST['mail'] ?? $user->mail ?>">
                     <span class="text-danger"><?= isset($error['mail']) ? $error['mail'] : '' ?></span>
@@ -58,7 +54,6 @@ $user = $user::all()->where('id', $data[1])->first();
                     <label for="role">Роль</label>
                     <select required class="form-control" name="role" id="role">
                         <?php
-//                        $userRole = trim($_POST['role']) ?? $user->role_id;
                         foreach (Role::all() as $role): ?>
                             <option value="<?= $role->id ?>" <?=
                             (int) $_SESSION['role'] === (int) $role->id ? 'selected' : ''
@@ -72,16 +67,14 @@ $user = $user::all()->where('id', $data[1])->first();
                 <div class="form-group">
                     <input type="checkbox"
                            name="subscribe"
+                           class="checkbox"
                            id="subscribe"
                         <?php
-                        if (isset($_POST['subscribe'])): ?>
-                            checked
-                        <?php
-                        elseif (!isset($_POST) && (bool)$user->subscribe): ?>
+                        if ((bool)$user->subscribe): ?>
                             checked
                         <?php
                         endif; ?>>
-                    <label for="subscribe">Подписан на рассылку</label>
+                    <label class="checkbox" for="subscribe">Подписан на рассылку</label>
                 </div>
             </li>
             <li class="col-md-6">

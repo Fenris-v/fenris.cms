@@ -45,14 +45,8 @@ class Route
      */
     public function match($method, $uri): bool
     {
-        if (
-            $this->method === $method &&
-            preg_match('/^' . str_replace(['*', '/'], ['\w+', '\/'], $this->getPath()) . '$/', $uri)
-        ) {
-            return true;
-        }
-
-        return false;
+        return $this->method === $method &&
+            preg_match('/^' . str_replace(['*', '/'], ['(\w+-?)+', '\/'], $this->getPath()) . '$/', $uri);
     }
 
     /**

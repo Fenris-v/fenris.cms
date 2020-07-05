@@ -6,8 +6,21 @@
 
                 use App\Model\User;
 
-                if (isset($_SESSION['login'])): ?>
-                    <a class="btn btn-primary" href="#">Подписаться</a>
+                if (isset($_POST['subscribe']) || isset($_POST['unsubscribe'])) {
+                    (new User())->changeSubscribe();
+                }
+
+                if (isset($_SESSION['login'])):
+                    $isSubscribe = (bool)User::all()
+                        ->where('login', $_SESSION['login'])
+                        ->first()
+                        ->subscribe; ?>
+                    <form method="post">
+                        <input type="submit"
+                               name="<?= $isSubscribe ? 'unsubscribe' : 'subscribe' ?>"
+                               value="<?= $isSubscribe ? 'Отписаться' : 'Подписаться' ?>"
+                               class="btn btn-primary">
+                    </form>
                 <?php
                 endif; ?>
             </div>
@@ -20,7 +33,7 @@
             <div class="col-4 d-flex justify-content-end align-items-center">
                 <?php
                 if (isset($_SESSION['login']) && $_SESSION['login'] && isset($_SESSION['role'])): ?>
-                    <a href="#" class="userLink mr-5 d-flex align-items-center">
+                    <a href="/lk/<?= $_SESSION['login'] ?>" class="userLink mr-5 d-flex align-items-center">
                         <i class="fas fa-user mr-2"></i>
                         <p>Привет, <?= trim(User::getInstance()->getName()); ?>!</p>
                     </a>

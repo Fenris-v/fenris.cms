@@ -49,7 +49,12 @@ final class User extends Model
             ->login;
     }
 
-    public function getRoleName($id): string
+    /**
+     * Возвращает название роли
+     * @param int $id
+     * @return string
+     */
+    public function getRoleName(int $id): string
     {
         return (new Role())->getRoleVisibleName(
             $this::all()
@@ -262,7 +267,12 @@ final class User extends Model
         return $password;
     }
 
-    public function setNewData($userId): array
+    /**
+     * Устанавливает новые значения для пользователя
+     * @param $userId - id пользователя
+     * @return array - ошибки или пустой массив
+     */
+    public function setNewData(int $userId): array
     {
         $user = $this::all()->where('id', $userId)->first();
 
@@ -307,16 +317,140 @@ final class User extends Model
         return $error;
     }
 
+    public function changeSubscribe(): void
+    {
+        $user = $this::all()->where('login', $_SESSION['login'])->first();
+
+        if (isset($_POST['subscribe'])) {
+            $user->subscribe = 1;
+        } else {
+            $user->subscribe = 0;
+        }
+
+        $user->save();
+    }
+
+    /**
+     * Возвращает id роли пользователя
+     * @return int
+     */
     public function getRoleId(): int
     {
-        return (int) $this::all()->where('login', $_SESSION['login'])->first()->role_id;
+        return (int)$this::all()->where('login', $_SESSION['login'])->first()->role_id;
+    }
+
+    public function minEdit(string $login): array
+    {
+        $error = [];
+
+        $user = $this::all()->where('login', $login)->first();
+
+        if (!filter_var($_POST['mail'], FILTER_VALIDATE_EMAIL)) {
+            $error['mail'] = 'Не правильный формат почты';
+        } elseif (
+            $this::all()
+                ->where('login', '!=', $login)
+                ->where('mail', $_POST['mail'])
+                ->first() !== null
+        ) {
+            $error['mail'] = 'Данная почта принадлежит другому пользователю';
+        }
+
+        if (!empty($error)) {
+            return $error;
+        }
+
+        $user->name = trim($_POST['name']);
+        $user->mail = trim($_POST['mail']);
+        $user->about = trim($_POST['aboutUser']);
+
+        $user->save();
+
+        return $error;
+    }
+
+    /**
+     * Удаляет аватар и картинку
+     * @param string $login
+     */
+    public
+    function removeAvatar(
+        string $login
+    ): void {
+        $user = $this::all()->where('login', $login)->first();
+
+        if ($user->avatar && file_exists($_SERVER['DOCUMENT_ROOT'] . $user->avatar)) {
+            unlink($_SERVER['DOCUMENT_ROOT'] . $user->avatar);
+        }
+
+        $user->avatar = '';
+        $user->save();
+    }
+
+    /**
+     * Загружает аватар пользователя
+     * @param $login
+     * @return string|null
+     */
+    public
+    function setAvatar(
+        $login
+    ): ?string {
+        if (isset($_FILES['image']) && $_FILES['image']['error'] === 0) {
+            if ($_FILES['image']['size'] > AVATAR_MAX_SIZE_B) {
+                return 'Максимальный размер изображения ' . AVATAR_MAX_SIZE . 'мб';
+            } elseif (!in_array(mime_content_type($_FILES['image']['tmp_name']), ALLOWED_IMAGES)) {
+                return 'Недопустимое расширение файла';
+            }
+        }
+
+        $image = $this->uploadImage($_FILES['image'], $login);
+
+        $user = $this::all()->where('login', $login)->first();
+        $user->avatar = $image;
+        $user->save();
+
+        return null;
+    }
+
+    /**
+     * Загружает изображение на сервер и возвращает путь к загруженной картинке
+     * @param $image
+     * @param $name
+     * @return string
+     */
+    private
+    function uploadImage(
+        array $image,
+        string $name
+    ): string {
+        if (!file_exists(IMAGE_DIR)) {
+            mkdir(IMAGE_DIR);
+        }
+
+        if (!file_exists(AVATAR_UPLOAD_DIR)) {
+            mkdir(AVATAR_UPLOAD_DIR);
+        }
+
+        $partsName = explode('.', $image['name']);
+        $format = $partsName[array_key_last($partsName)];
+        $name .= '.' . $format;
+
+        if (in_array($name, scandir(AVATAR_UPLOAD_DIR))) {
+            unlink(AVATAR_UPLOAD_DIR . $name);
+        }
+
+        move_uploaded_file($image['tmp_name'], AVATAR_UPLOAD_DIR . $name);
+
+        return AVATAR_PATH . $name;
     }
 
     /**
      * Возвращает роль пользователя
      * @return string
      */
-    private function getUserRole(): string
+    private
+    function getUserRole(): string
     {
         return (new Role())->getRoleName(
             $this::all()
@@ -331,8 +465,11 @@ final class User extends Model
      * @param $to - почта, на которую отправляется код
      * @param $user - имя пользователя
      */
-    private function writeCode($to, $user)
-    {
+    private
+    function writeCode(
+        string $to,
+        string $user
+    ) {
         $mail = new Mail();
         $code = $mail->generateSecretCode();
         $msg = $mail->textForSecretCodeMsg($user, $code);
@@ -345,7 +482,8 @@ final class User extends Model
     /**
      * Создает нового пользователя
      */
-    private function create(): void
+    private
+    function create(): void
     {
         $user = new $this;
         $user->login = $_SESSION['login'];
@@ -366,8 +504,10 @@ final class User extends Model
      * @param $mail - почта
      * @return string|null - текст ошибки
      */
-    private function checkMail($mail): ?string
-    {
+    private
+    function checkMail(
+        string $mail
+    ): ?string {
         if (!isset($mail) || empty($mail)) {
             return 'Введите почту';
         } elseif (!filter_var($mail)) {
@@ -384,8 +524,10 @@ final class User extends Model
      * @param $login - логин
      * @return string|null - текст ошибки
      */
-    private function checkLogin($login): ?string
-    {
+    private
+    function checkLogin(
+        string $login
+    ): ?string {
         if (!isset($login) || empty($login)) {
             return 'Введите логин';
         } elseif (strlen($login) < MIN_LOGIN_LENGTH) {
@@ -404,8 +546,10 @@ final class User extends Model
      * @param $password - пароль
      * @return string|null - текст ошибки
      */
-    private function checkPassword($password): ?string
-    {
+    private
+    function checkPassword(
+        string $password
+    ): ?string {
         if (!isset($password) || empty($password)) {
             return 'Введите пароль';
         } elseif (strlen($password) < MIN_PASSWORD_LENGTH) {
@@ -422,8 +566,11 @@ final class User extends Model
      * @param $login - логин пользователя
      * @param $password - пароль для создания md5
      */
-    private function remember($login, $password): void
-    {
+    private
+    function remember(
+        string $login,
+        string $password
+    ): void {
         $password_token = md5($login . $password . time());
 
         $this::all()
@@ -438,8 +585,10 @@ final class User extends Model
      * Удаляет токен для "запоминания" пользователя из БД
      * @param $login - логин пользователя, для которого удалить токен
      */
-    private function removeToken($login): void
-    {
+    private
+    function removeToken(
+        string $login
+    ): void {
         $this::all()
             ->where('login', $login)
             ->first()
@@ -450,7 +599,8 @@ final class User extends Model
      * Сверяет логин и пароль
      * @return bool true - если пара верна, false - если не совпадает / не существует
      */
-    private function verifyAuthData(): bool
+    private
+    function verifyAuthData(): bool
     {
         if ($_POST['username'] && $_POST['password']) {
             $user = $this::all()->where($this->loginType(), $_POST['username'])->first();
@@ -466,7 +616,8 @@ final class User extends Model
      * Возвращает тип логина
      * @return string - почта или логин
      */
-    private function loginType(): string
+    private
+    function loginType(): string
     {
         return filter_var($_POST['username'], FILTER_VALIDATE_EMAIL) ? 'mail' : 'login';
     }

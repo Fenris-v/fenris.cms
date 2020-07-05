@@ -8,7 +8,7 @@ $categories = Category::all(); ?>
     <?php
     foreach ($categories as $category):
         $categoryData = $category->attributesToArray(); ?>
-        <a class="p-2" href="<?= $category['uri'] ?>">
+        <a class="p-2" href="/<?= $category['uri'] ?>">
             <?= $category['name'] ?>
         </a>
     <?php

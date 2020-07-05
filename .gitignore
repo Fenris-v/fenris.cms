@@ -1,5 +1,7 @@
 /vendor/
 /composer.phar
-/templates/css/.sass-cache/
-/templates/css/fontawesome/
+/templates/css/.sass-cache
+/templates/css/fontawesome
 /log/
+/templates/images/upload/
+/templates/images/avatar/

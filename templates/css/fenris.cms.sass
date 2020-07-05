@@ -193,4 +193,25 @@ footer
   &.active
     color: #007bff
 
+.checkbox:hover
+  cursor: pointer
+
+.undefinedPage
+  font-size: 50px
+  top: 50%
+  left: 50%
+  @include transform(translate(-50%, -50%))
+
+.topArticleImage
+  max-width: 100%
+  @include object-fit()
+
+.avatar
+  width: 400px
+  height: 400px
+  @include object-fit()
+
+.avatarUpload
+  width: 330px
+
 @import "fenris.cms.responsive"

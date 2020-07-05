@@ -2,7 +2,6 @@
 
 use App\Application;
 use App\Controller;
-use App\Model\Permission;
 use App\Model\User;
 use App\Router;
 use App\Session;
@@ -40,24 +39,16 @@ $router = new Router();
 /** Создаем класс контроллера */
 $controller = new Controller();
 
-// TODO: delete not using urls
-/** Регистрируем в созданном роутере доступные пути */
-$router->get('/about', $controller->about());
-$router->get('/news', $controller->news());
-$router->get('/news/*/news/*', $controller->newsParams());
-$router->post('/news', $controller->news());
-$router->get('/books', $controller->books());
-$router->get('/post/*', $controller->post());
-
 // FOR RELEASE
 $router->get('/', $controller->index());
-//TODO: delete 'post'
+$router->get('/lk/*', $controller->profile());
 $router->get('/admin/*', $controller->admin());
 $router->get('/admin/*/*', $controller->admin());
+$router->get('/admin/*/*/*', $controller->admin());
+$router->get('/admin/*/*/*/*', $controller->admin());
 $router->get('/auth', $controller->auth());
 $router->get('/auth/*', $controller->auth());
 $router->get('/registration', $controller->reg());
-$router->get('/profile/*', $controller->profile());
 $router->get('/*', $controller->categories());
 $router->get('/*/*', $controller->article());
 

@@ -1,6 +1,7 @@
 <header>
     <nav class="navbar navbar-light fixed-top bg-yellow flex-md-nowrap p-0 shadow">
-        <a class="cyber navbar-brand col-sm-3 col-md-2 mr-0" href="#">
+        <!--suppress HtmlUnknownTarget -->
+        <a class="cyber navbar-brand col-sm-3 col-md-2 mr-0" href="/">
             <img class="adminLogo" src="/templates/images/logo.jpeg" alt="logo">
             Fenris.CMS
         </a>

@@ -593,6 +593,33 @@ footer {
   .sidebar .nav-link.active {
     color: #007bff; }
 
+.checkbox:hover {
+  cursor: pointer; }
+
+.undefinedPage {
+  font-size: 50px;
+  top: 50%;
+  left: 50%;
+  -moz-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  -o-transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%); }
+
+.topArticleImage {
+  max-width: 100%;
+  -o-object-fit: cover;
+  object-fit: cover; }
+
+.avatar {
+  width: 400px;
+  height: 400px;
+  -o-object-fit: cover;
+  object-fit: cover; }
+
+.avatarUpload {
+  width: 330px; }
+
 @font-face {
   font-family: roboto;
   src: url(/templates/fonts/Roboto-Regular.ttf); }

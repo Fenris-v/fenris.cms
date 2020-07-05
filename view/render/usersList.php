@@ -20,7 +20,7 @@ foreach (User::all() as $user): ?>
             ?></td>
         <td>
             <a href="<?=
-            $_SERVER['REQUEST_URI'] . '/' . $user->getOriginal('id')
+            '/admin/users/edit/' . $user->getOriginal('id')
             ?>">Изменить</a>
         </td>
     </tr>

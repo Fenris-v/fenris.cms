@@ -84,7 +84,7 @@ function logger(string $filename, $log, string $mode = 'w+'): void
  * Преобразование массива в строку
  * @param $log - массив
  */
-function arrayFormatForLog(&$log)
+function arrayFormatForLog(array &$log): void
 {
     $log = json_encode($log, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 }
@@ -98,52 +98,35 @@ function isSessionLive(): bool
     return time() - $_SESSION['secret_code_time'] < SECRET_CODE_LIFE * 60 * 60;
 }
 
-function generateUri(string $str): string
-{
-    $converter = [
-        'а' => 'a',
-        'б' => 'b',
-        'в' => 'v',
-        'г' => 'g',
-        'д' => 'd',
-        'е' => 'e',
-        'ё' => 'e',
-        'ж' => 'zh',
-        'з' => 'z',
-        'и' => 'i',
-        'й' => 'y',
-        'к' => 'k',
-        'л' => 'l',
-        'м' => 'm',
-        'н' => 'n',
-        'о' => 'o',
-        'п' => 'p',
-        'р' => 'r',
-        'с' => 's',
-        'т' => 't',
-        'у' => 'u',
-        'ф' => 'f',
-        'х' => 'h',
-        'ц' => 'c',
-        'ч' => 'ch',
-        'ш' => 'sh',
-        'щ' => 'sch',
-        'ь' => '\'',
-        'ы' => 'y',
-        'ъ' => '\'',
-        'э' => 'e',
-        'ю' => 'yu',
-        'я' => 'ya',
-    ];
-
-    return preg_replace('~[^-a-z0-9_]+~u', '-', strtr(mb_strtolower($str), $converter));
-}
-
-function getLayoutName($section, $params): string
+/**
+ * Возвращает имя view, который нужно подключить
+ * @param $section - откуда строить имя
+ * @param $params - параметры для имени
+ * @return string
+ */
+function getTemplateName(string $section, array $params): string
 {
     foreach ($params as $param) {
         $section .= '.' . $param;
-    }
 
+        if ($param === 'edit' || $param === 'list') {
+            return $section;
+        }
+    }
     return $section;
+}
+
+/**
+ * Делает первую букву строки заглавной (для кириллицы)
+ * @param $str - строка для преобразования
+ * @return string
+ */
+function mb_ucfirst(string $str)
+{
+    return mb_strtoupper(mb_substr($str, 0, 1)) . mb_substr($str, 1);
+}
+
+function cutStr(string $str, int $length = 20, string $replace = '...'): string
+{
+    return mb_strimwidth($str, 0, ($length + strlen($replace)), $replace);
 }

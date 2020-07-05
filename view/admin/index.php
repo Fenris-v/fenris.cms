@@ -3,9 +3,13 @@
 use App\Model\AdminPage;
 use App\Model\Permission;
 
-$page = new AdminPage();
 /** @noinspection PhpUndefinedVariableInspection */
-$pageId = $page::all()->where('uri', '/' . $params[0])->first()->id;
+if (count($params) < 2) {
+    redirectOnPage($_SERVER['REQUEST_URI'] . '/list');
+}
+
+$page = new AdminPage();
+$pageId = $page::all()->where('uri', $params[0])->first()->id;
 
 try {
     includeView('layout.header', ['title' => $page->getTitle($params[0])]);
@@ -32,11 +36,8 @@ try {
                     ->first()
                 ) {
                     try {
-                        if (count($params) > 1) {
-                            includeView('admin.' . $params[0] . '.edit', $params);
-                        } else {
-                            includeView('admin.' . $params[0] . '.' . $params[0]);
-                        }
+                        $templateName = getTemplateName('admin', $params);
+                        includeView($templateName, [$params[array_key_last($params)]]);
                     } catch (Exception $exception) {
                         echo $exception->getMessage() . ' ' . $exception->getCode();
                     }
