@@ -2,6 +2,8 @@
 
 namespace App\Model;
 
+use App\Mail;
+
 /**
  * Модель статей
  * Class Article
@@ -32,6 +34,8 @@ class Article extends Page
 
         $article = new $this;
         $this->saveData($article, (string)$title, (string)$alias, (string)$image);
+
+        (new Mail())->mailing((string) $alias);
 
         return ['success' => 'yes'];
     }

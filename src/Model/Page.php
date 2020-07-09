@@ -18,7 +18,12 @@ abstract class Page extends Model implements GetPage
      */
     public function getTitle(string $uri): ?string
     {
-        return $this::all()->where('uri', trim($uri, '/'))->first()->meta_title;
+        $page = $this::all()->where('uri', trim($uri, '/'))->first();
+        if ($page !== null) {
+            return $page->meta_title;
+        }
+
+        return null;
     }
 
     /**
@@ -28,7 +33,12 @@ abstract class Page extends Model implements GetPage
      */
     public function getDescription(string $uri): ?string
     {
-        return $this::all()->where('uri', trim($uri, '/'))->first()->meta_description;
+        $page = $this::all()->where('uri', trim($uri, '/'))->first();
+        if ($page !== null) {
+            return $page->meta_description;
+        }
+
+        return null;
     }
 
     /**

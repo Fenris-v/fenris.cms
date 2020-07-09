@@ -25,3 +25,4 @@ define('AVATAR_MAX_SIZE_B', AVATAR_MAX_SIZE * 1024 * 1024);
 define('ALLOWED_IMAGES', ['image/jpg', 'image/jpeg', 'image/png', 'image/gif']);
 
 define('NO_REPLY_MAIL', 'no-reply@fenris.cms');
+define('BLOG_MAIL', 'fenris-blog@fenris.cms');

@@ -46,10 +46,13 @@ $router->get('/admin/*', $controller->admin());
 $router->get('/admin/*/*', $controller->admin());
 $router->get('/admin/*/*/*', $controller->admin());
 $router->get('/admin/*/*/*/*', $controller->admin());
+$router->get('/rules', $controller->rules());
 $router->get('/auth', $controller->auth());
 $router->get('/auth/*', $controller->auth());
 $router->get('/registration', $controller->reg());
+$router->get('/page/*', $controller->index());
 $router->get('/*', $controller->categories());
+$router->get('/*/page/*', $controller->categories());
 $router->get('/*/*', $controller->article());
 
 /** Создаем экземпляр для запуска приложения */

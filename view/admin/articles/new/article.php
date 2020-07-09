@@ -7,9 +7,12 @@ if (!empty($_POST)) {
     $article = new Article();
     $error = $article->addArticle();
 
-    if (isset($error['success']) && $error['success'] === 'yes') {
-        redirectOnPage('/admin/articles');
-    }
+    if (isset($error['success']) && $error['success'] === 'yes'): ?>
+        <script>
+            window.location.href = window.location.origin + '/admin/articles'
+        </script>
+    <?php
+    endif;
 } ?>
 
 <div class="row">

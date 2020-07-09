@@ -1,7 +1,3 @@
-<?php
-// TODO: add methods for delete users
-?>
-
 <table class="table table-bordered">
     <thead>
     <tr>

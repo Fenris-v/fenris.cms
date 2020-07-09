@@ -14,7 +14,7 @@ final class User extends Model
 {
     public static ?User $instance = null;
     public static ?string $role = null;
-    protected $fillable = ['password_token', 'password', 'mail', 'role_id', 'updated_at'];
+    protected $fillable = ['password_token', 'password', 'mail', 'role_id'];
 
     /**
      * Делать класс синглтоном
@@ -317,19 +317,6 @@ final class User extends Model
         return $error;
     }
 
-    public function changeSubscribe(): void
-    {
-        $user = $this::all()->where('login', $_SESSION['login'])->first();
-
-        if (isset($_POST['subscribe'])) {
-            $user->subscribe = 1;
-        } else {
-            $user->subscribe = 0;
-        }
-
-        $user->save();
-    }
-
     /**
      * Возвращает id роли пользователя
      * @return int
@@ -373,8 +360,7 @@ final class User extends Model
      * Удаляет аватар и картинку
      * @param string $login
      */
-    public
-    function removeAvatar(
+    public function removeAvatar(
         string $login
     ): void {
         $user = $this::all()->where('login', $login)->first();
@@ -392,8 +378,7 @@ final class User extends Model
      * @param $login
      * @return string|null
      */
-    public
-    function setAvatar(
+    public function setAvatar(
         $login
     ): ?string {
         if (isset($_FILES['image']) && $_FILES['image']['error'] === 0) {
@@ -419,8 +404,7 @@ final class User extends Model
      * @param $name
      * @return string
      */
-    private
-    function uploadImage(
+    private function uploadImage(
         array $image,
         string $name
     ): string {
@@ -449,8 +433,7 @@ final class User extends Model
      * Возвращает роль пользователя
      * @return string
      */
-    private
-    function getUserRole(): string
+    private function getUserRole(): string
     {
         return (new Role())->getRoleName(
             $this::all()
@@ -465,8 +448,7 @@ final class User extends Model
      * @param $to - почта, на которую отправляется код
      * @param $user - имя пользователя
      */
-    private
-    function writeCode(
+    private function writeCode(
         string $to,
         string $user
     ) {
@@ -482,8 +464,7 @@ final class User extends Model
     /**
      * Создает нового пользователя
      */
-    private
-    function create(): void
+    private function create(): void
     {
         $user = new $this;
         $user->login = $_SESSION['login'];
@@ -504,8 +485,7 @@ final class User extends Model
      * @param $mail - почта
      * @return string|null - текст ошибки
      */
-    private
-    function checkMail(
+    private function checkMail(
         string $mail
     ): ?string {
         if (!isset($mail) || empty($mail)) {
@@ -524,8 +504,7 @@ final class User extends Model
      * @param $login - логин
      * @return string|null - текст ошибки
      */
-    private
-    function checkLogin(
+    private function checkLogin(
         string $login
     ): ?string {
         if (!isset($login) || empty($login)) {
@@ -546,8 +525,7 @@ final class User extends Model
      * @param $password - пароль
      * @return string|null - текст ошибки
      */
-    private
-    function checkPassword(
+    private function checkPassword(
         string $password
     ): ?string {
         if (!isset($password) || empty($password)) {
@@ -566,8 +544,7 @@ final class User extends Model
      * @param $login - логин пользователя
      * @param $password - пароль для создания md5
      */
-    private
-    function remember(
+    private function remember(
         string $login,
         string $password
     ): void {
@@ -585,8 +562,7 @@ final class User extends Model
      * Удаляет токен для "запоминания" пользователя из БД
      * @param $login - логин пользователя, для которого удалить токен
      */
-    private
-    function removeToken(
+    private function removeToken(
         string $login
     ): void {
         $this::all()
@@ -599,8 +575,7 @@ final class User extends Model
      * Сверяет логин и пароль
      * @return bool true - если пара верна, false - если не совпадает / не существует
      */
-    private
-    function verifyAuthData(): bool
+    private function verifyAuthData(): bool
     {
         if ($_POST['username'] && $_POST['password']) {
             $user = $this::all()->where($this->loginType(), $_POST['username'])->first();
@@ -616,8 +591,7 @@ final class User extends Model
      * Возвращает тип логина
      * @return string - почта или логин
      */
-    private
-    function loginType(): string
+    private function loginType(): string
     {
         return filter_var($_POST['username'], FILTER_VALIDATE_EMAIL) ? 'mail' : 'login';
     }

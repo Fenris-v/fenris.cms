@@ -27,7 +27,7 @@ if (isset($data[0])) {
                     <h3 class="mb-0"><?= cutStr($article->title) ?></h3>
                     <div class="mb-1 text-muted"><?= $article->created_at ?></div>
                     <p class=""><?= cutStr($article->short_desc, 105) ?></p>
-                    <a href="/<?= isset($category) ? $category->uri : $categories
+                    <a href="<?= isset($category) ? $_SERVER['REQUEST_URI'] . '/' . $article->uri : '/' . $categories
                         ->where('id', $article->category_id)
                         ->first()
                         ->uri . '/' . $article->uri ?>" class="stretched-link">Продолжить читать</a>

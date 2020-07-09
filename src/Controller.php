@@ -22,8 +22,8 @@ class Controller
      */
     public function index(): callable
     {
-        return function () {
-            return new View\View('index', ['title' => 'Главная страница']);
+        return function ($params) {
+            return new View\View('index', ['title' => 'Главная страница', 'page' => $params]);
         };
     }
 
@@ -83,6 +83,17 @@ class Controller
     {
         return function ($params = '') {
             return new View\View('auth.auth', ['title' => 'Авторизация', 'param' => $params]);
+        };
+    }
+
+    /**
+     * Возвращает callback для страницы правил
+     * @return callable - callback
+     */
+    public function rules(): callable
+    {
+        return function ($params = '') {
+            return new View\View('rules.rules', ['title' => 'Правила пользования сайтом', 'param' => $params]);
         };
     }
 

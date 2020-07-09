@@ -609,7 +609,8 @@ footer {
 .topArticleImage {
   max-width: 100%;
   -o-object-fit: cover;
-  object-fit: cover; }
+  object-fit: cover;
+  min-height: 100%; }
 
 .avatar {
   width: 400px;
@@ -619,6 +620,19 @@ footer {
 
 .avatarUpload {
   width: 330px; }
+
+.topSubscribe {
+  max-width: 200px; }
+
+hr {
+  height: 1px;
+  background: #fbee17;
+  border: none;
+  width: 100%; }
+
+.article p {
+  margin-bottom: 10px;
+  line-height: 1.4; }
 
 @font-face {
   font-family: roboto;

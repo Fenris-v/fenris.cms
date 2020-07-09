@@ -1,11 +1,15 @@
 <footer class="bg-yellow py-3 mt-auto">
     <div class="container">
         <div class="footer row d-flex align-items-center">
-            <div class="col-6 copyright">
+            <div class="col-md-5 copyright">
                 &copy; Developed by Fenris.
                 <?= date('Y') == 2020 ? 2020 : 2020 . '-' . date('Y'); ?>
             </div>
-            <div class="col-6 d-flex justify-content-end social-links align-items-center">
+            <div class="col-md-2">
+                <!--suppress HtmlUnknownTarget -->
+                <a href="/rules">Правила пользования сайтом</a>
+            </div>
+            <div class="col-md-5 d-flex justify-content-end social-links align-items-center">
                 <p>Follow us:</p>
                 <ul>
                     <li class="mx-2">
@@ -22,5 +26,3 @@
 <script src="/templates/js/jquery-3.5.1.min.js"></script>
 <script src="/templates/js/popper.min.js"></script>
 <script src="/templates/js/bootstrap.min.js"></script>
-</body>
-</html>

@@ -2,9 +2,14 @@
 
 use App\Model\Article;
 use App\Model\Category;
+use App\Model\Config;
 
 if ($data[0] === 'list') {
     redirectOnPage($_SERVER['REQUEST_URI'] . '/' . Category::all()->first()->uri);
+}
+
+if (isset($_POST['per_page'])) {
+    (new Config())->setPageSize();
 }
 
 $categories = Category::all();
@@ -17,13 +22,24 @@ if ($category !== null) {
     $articles = Article::all()->where('category_id', $categoryId);
 
     ?>
-    <div class="d-flex mb-3">
+    <div class="d-flex mb-3 align-items-start">
         <!--suppress HtmlUnknownTarget -->
         <a class="btn btn-primary text-white mr-3" href="/admin/articles/new/article"><i
                     class="fas fa-plus-circle mr-2"></i>Добавить статью</a>
         <!--suppress HtmlUnknownTarget -->
         <a class="btn btn-primary text-white mr-3" href="/admin/articles/new/category"><i
                     class="fas fa-plus-circle mr-2"></i>Добавить категорию</a>
+        <form method="post" class="ml-auto">
+                <label for="perPage">Количество статей на странице</label>
+                <select name="per_page" id="perPage" class="form-control mb-2">
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                    <option value="200">200</option>
+                    <option value="all">Все</option>
+                </select>
+            <input type="submit" class="btn btn-primary" value="Применить">
+        </form>
     </div>
     <div>
         <h1 class="h2">Категории</h1>
@@ -77,8 +93,8 @@ if ($category !== null) {
             </tbody>
         </table>
     </div>
-<?php
+    <?php
 } else { ?>
     <h2 class="h2 text-danger">Такой категории не существует, проверьте адрес</h2>
-<?php
+    <?php
 }
