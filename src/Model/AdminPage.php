@@ -8,7 +8,6 @@ class AdminPage extends Page
      * Возвращает страницы для меню админки с учетом роли
      * @return array
      */
-    // TODO: просьба прокомментировать реализацию данного метода
     public function getPagesForRole(): array
     {
         $pages = [];

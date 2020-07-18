@@ -2,6 +2,7 @@
 
 use App\Application;
 use App\Controller;
+use App\Controller\UserController;
 use App\Model\User;
 use App\Router;
 use App\Session;
@@ -39,28 +40,27 @@ $router = new Router();
 /** Создаем класс контроллера */
 $controller = new Controller();
 
-// FOR RELEASE
-$router->get('/', $controller->index());
-$router->get('/lk/*', $controller->profile());
-$router->get('/admin/*', $controller->admin());
-$router->get('/admin/*/*', $controller->admin());
-$router->get('/admin/*/*/*', $controller->admin());
-$router->get('/admin/*/*/*/*', $controller->admin());
-$router->get('/rules', $controller->rules());
-$router->get('/auth', $controller->auth());
-$router->get('/auth/*', $controller->auth());
-$router->get('/registration', $controller->reg());
-$router->get('/page/*', $controller->index());
-$router->get('/*', $controller->categories());
-$router->get('/*/page/*', $controller->categories());
-$router->get('/*/*', $controller->article());
+$router->get('/', Controller::class . '@index');
+$router->get('/lk/*', Controller::class . '@profile');
+$router->get('/admin/*', Controller::class . '@admin');
+$router->get('/admin/*/*', Controller::class . '@admin');
+$router->get('/admin/*/*/*', Controller::class . '@admin');
+$router->get('/admin/*/*/*/*', Controller::class . '@admin');
+$router->get('/rules', Controller::class . '@rules');
+$router->get('/auth', Controller::class . '@auth');
+$router->get('/auth/*', Controller::class . '@auth');
+$router->get('/registration', Controller::class . '@reg');
+$router->get('/page/*', Controller::class . '@index');
+$router->get('/*', Controller::class . '@categories');
+$router->get('/*/page/*', Controller::class . '@categories');
+$router->get('/*/*', Controller::class . '@article');
 
 /** Создаем экземпляр для запуска приложения */
 $application = new Application($router);
 
 /** Авторизуем пользователя, если есть токен */
 if (!isset($_SESSION['login']) && isset($_COOKIE['password_token']) && !empty($_COOKIE['password_token'])) {
-    User::getInstance()->fastAuth();
+    (new UserController())->fastAuth();
 }
 
 if (trim(trim($_SERVER['REQUEST_URI']), '/') === 'admin') {
@@ -78,7 +78,7 @@ if (trim(trim($_SERVER['REQUEST_URI']), '/') === 'admin') {
 }
 
 /** Определяем роль пользователя */
-if (isset($_SESSION['login'])) {
+if (isset($_SESSION['login']) && !isset($_SESSION['secret_code'])) {
     $session->set('role', (new User)->getRoleId());
 }
 

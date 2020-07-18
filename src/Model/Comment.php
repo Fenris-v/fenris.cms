@@ -4,51 +4,51 @@ namespace App\Model;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property mixed article_id
+ * @property mixed text
+ * @property mixed user_id
+ * @property mixed approve
+ */
 class Comment extends Model
 {
     /**
-     * Добавляет комментарий
-     * @param int $articleId
+     * @param $articleId
+     * @return $this
      */
-    public function saveComment(int $articleId): void
+    public function setArticleId($articleId): Comment
     {
-        $user = new User();
-
-        $comment = new $this;
-        $comment->article_id = $articleId;
-        $comment->text = trim($_POST['comment']);
-        $comment->user_id = User::all()->where('login', $_SESSION['login'])->first()->id;
-        $comment->approve = $user->isSuperUser() || $user->isManager() ? 1 : 0;
-
-        $comment->save();
+        $this->article_id = $articleId;
+        return $this;
     }
 
     /**
-     * Подтверждает комментарий
+     * @param $text
+     * @return $this
      */
-    public function approveComment(): void
+    public function setText($text): Comment
     {
-        $comment = $this::all()->where('id', $_POST['commentId'])->first();
-
-        if ($comment === null) {
-            return;
-        }
-
-        $comment->approve = 1;
-        $comment->save();
+        $this->text = $text;
+        return $this;
     }
 
     /**
-     * Удаляет комментарий
+     * @param $userId
+     * @return $this
      */
-    public function removeComment(): void
+    public function setUserId($userId): Comment
     {
-        $comment = $this::all()->where('id', $_POST['commentId'])->first();
+        $this->user_id = $userId;
+        return $this;
+    }
 
-        if ($comment === null) {
-            return;
-        }
-
-        $comment->delete();
+    /**
+     * @param $approve
+     * @return $this
+     */
+    public function setApprove($approve): Comment
+    {
+        $this->approve = $approve;
+        return $this;
     }
 }

@@ -1,14 +1,21 @@
 <?php
 
-use App\Model\User;
+use App\Controller\UserController;
+use App\Exception\DataException;
 
 if (isset($_POST['new_code'])) {
-    User::getInstance()->newCode();
+    (new UserController())->newCode();
     redirectOnPage($_SERVER['REQUEST_URI']);
 } elseif (isset($_POST['secret'])) {
-    $error = User::getInstance()->checkCode();
+    try {
+        (new UserController())->checkCode();
+    } catch (DataException $exception) {
+    }
 } elseif (isset($_POST['email']) && isset($_POST['password']) && isset($_POST['username'])) {
-    $error = User::getInstance()->registration();
+    try {
+        (new UserController())->registration();
+    } catch (DataException $exception) {
+    }
 }
 
 try {
@@ -39,7 +46,7 @@ try {
         <label for="secret" class="sr-only">Код из письма</label>
         <input name="secret" type="text" id="secret" class="form-control" placeholder="Код из письма"
                autofocus="">
-        <span class="text-danger"><?= isset($error) && !isset($_POST['new_code']) ? $error : '' ?></span>
+        <span class="text-danger"><?= DataException::$errors['code'] ?? '' ?></span>
         <button class="btn btn-lg btn-primary btn-block mt-2" type="submit">Подтвердить</button>
         <button name="new_code" class="btn btn-lg btn-secondary btn-block mt-2" type="submit">Новый код</button>
     <?php
@@ -47,15 +54,15 @@ try {
         <label for="inputEmail" class="sr-only">Email</label>
         <input name="email" type="email" id="inputEmail" class="form-control" placeholder="Email" required=""
                autofocus="" value="<?= $_POST['email'] ?? '' ?>">
-        <span class="text-danger"><?= $error['mail'] ?? '' ?></span>
+        <span class="text-danger"><?= DataException::$errors['mail'] ?? '' ?></span>
         <label for="inputPassword" class="sr-only">Логин</label>
         <input name="username" type="text" id="inputLogin" class="form-control mt-2" placeholder="Логин" required=""
                value="<?= $_POST['username'] ?? '' ?>">
-        <span class="text-danger"><?= $error['login'] ?? '' ?></span>
+        <span class="text-danger"><?= DataException::$errors['login'] ?? '' ?></span>
         <label for="inputLogin" class="sr-only">Пароль</label>
         <input name="password" type="password" id="inputPassword" class="form-control mt-2" placeholder="Пароль"
                required="" value="<?= $_POST['password'] ?? '' ?>">
-        <span class="text-danger"><?= $error['password'] ?? '' ?></span>
+        <span class="text-danger"><?= DataException::$errors['password'] ?? '' ?></span>
         <button class="btn btn-lg btn-primary btn-block mt-2" type="submit">Зарегистрироваться</button>
         <!--suppress HtmlUnknownTarget -->
         <a href="/auth" class="signLink">Авторизоваться</a>

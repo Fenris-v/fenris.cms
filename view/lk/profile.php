@@ -1,19 +1,37 @@
 <?php
 
+use App\Controller\UserController;
+use App\Exception\DataException;
+use App\Exception\SaveException;
 use App\Model\User;
 
 if (!empty($_POST)) {
-    $user = new User();
-
     if (isset($_POST['upload']) && $_FILES['image']['error'] === 0) {
-        /** @noinspection PhpUndefinedVariableInspection */
-        $error = $user->setAvatar($param[array_key_last($param)]);
+        try {
+            /** @noinspection PhpUndefinedVariableInspection */
+            $error = (new UserController())->uploadAvatar($param[array_key_last($param)]);
+        } catch (DataException $exception) {
+        } catch (SaveException $exception) { ?>
+            <span class="text-danger"><?= $exception->getMessage() . ' - ' . $exception->getCode() ?></span>
+            <?php
+        }
     } elseif (isset($_POST['remove'])) {
-        /** @noinspection PhpUndefinedVariableInspection */
-        $user->removeAvatar($param[array_key_last($param)]);
+        try {
+            /** @noinspection PhpUndefinedVariableInspection */
+            (new UserController())->removeAvatar($param[array_key_last($param)]);
+        } catch (SaveException $e) { ?>
+            <span class="text-danger"><?= $exception->getMessage() . ' - ' . $exception->getCode() ?></span>
+            <?php
+        }
     } else {
-        /** @noinspection PhpUndefinedVariableInspection */
-        $error = $user->minEdit($param[array_key_last($param)]);
+        try {
+            /** @noinspection PhpUndefinedVariableInspection */
+            (new UserController)->minEdit($param[array_key_last($param)]);
+        } catch (DataException $exception) {
+        } catch (SaveException $exception) { ?>
+            <span class="text-danger"><?= $exception->getMessage() . ' - ' . $exception->getCode() ?></span>
+            <?php
+        }
     }
 }
 
@@ -54,7 +72,9 @@ try {
                                        class="form-control"
                                        id="mail"
                                        value="<?= $user->mail ?>">
-                                <span class="text-danger"><?= isset($error['mail']) ? $error['mail'] : '' ?></span>
+                                <span class="text-danger"><?= isset(DataException::$errors['mail'])
+                                        ? DataException::$errors['mail']
+                                        : '' ?></span>
                             </div>
                         </li>
                         <li class="col-md-12">
@@ -77,7 +97,9 @@ try {
                 </form>
             </div>
             <div class="col-md-4 d-flex justify-content-center align-items-start">
-                <form enctype="multipart/form-data" class="col-md-12 d-flex justify-content-center flex-column align-items-center" action="" method="post">
+                <form enctype="multipart/form-data"
+                      class="col-md-12 d-flex justify-content-center flex-column align-items-center" action=""
+                      method="post">
                     <img class="rounded-circle mb-3 avatar"
                          src="<?= $user->avatar !== '' ? $user->avatar : '/templates/images/logo.jpeg' ?>"
                          alt="user">
@@ -88,7 +110,9 @@ try {
                                class="form-control-file mb-3 avatarUpload"
                                id="image"
                                accept="image/png, image/jpeg, image/jpg, image/gif">
-                        <span class="text-danger"><?= isset($error) && gettype($error) === 'string' && $error ? $error : '' ?></span>
+                        <span class="text-danger"><?= isset(DataException::$errors['image'])
+                                ? DataException::$errors['image']
+                                : '' ?></span>
                     <?php
                     endif; ?>
                     <div class="form-group mb-3">

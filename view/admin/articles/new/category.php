@@ -1,13 +1,18 @@
 <?php
 
-use App\Model\Category;
+use App\Controller\CategoryController;
+use App\Exception\DataException;
+use App\Exception\SaveException;
 
 if (!empty($_POST)) {
-    $category = new Category();
-    $error = $category->addCategory();
-
-    if (empty($error['success']) && $error['success'] === 'yes') {
-        redirectOnPage('/admin/articles');
+    try {
+        (new CategoryController())->addCategory();
+    } catch (DataException $exception) { ?>
+        <span class="text-danger"><?= DataException::$errors['category'] ?></span>
+        <?php
+    } catch (SaveException $exception) { ?>
+        <span class="text-danger"><?= $exception->getMessage() . ' - ' . $exception->getCode() ?></span>
+        <?php
     }
 } ?>
 
@@ -23,7 +28,9 @@ if (!empty($_POST)) {
                            id="name"
                            required
                            value="<?= $_POST['name'] ?? '' ?>">
-                    <span class="text-danger"><?= isset($error) ? $error : '' ?></span>
+                    <span class="text-danger"><?= isset(DataException::$errors['category'])
+                            ? DataException::$errors['category']
+                            : '' ?></span>
                 </div>
             </li>
             <li class="col-md-6">

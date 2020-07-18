@@ -1,31 +1,43 @@
 <?php
 
-use App\Model\User;
+use App\Controller\UserController;
+use App\Exception\DataException;
 
 if (isset($_POST['new_code']) && $_POST['new_code'] === '') {
-    User::getInstance()->newCode();
+    (new UserController)->newCode();
     redirectOnPage($_SERVER['REQUEST_URI']);
 } elseif (!empty($_POST) && empty($param)) {
     unset($_SESSION['password_reset']);
-    $error = User::getInstance()->auth();
+    try {
+        (new UserController)->auth();
+    } catch (DataException $exception) {
+    }
 } elseif (isset($_POST['new_password'])) {
-    $success = User::getInstance()->resetPassword();
+    $success = (new UserController())->resetPassword();
 } elseif (
     isset($_POST['forget_submit']) && !isset($_SESSION['secret_code_time']) && !isset($success) ||
     isset($_POST['forget_submit']) && isset($_SESSION['secret_code_time']) && !isSessionLive() && !isset($success)
 ) {
-    $error = User::getInstance()->forgetPassword();
+    try {
+        (new UserController)->forgetPassword();
+    } catch (DataException $exception) { ?>
+        <?php
+    }
+}
+
+if (isset($_SESSION['secret_code']) && isset($_POST['secret'])) {
+    $isCheckCode = $_SESSION['secret_code'] === $_POST['secret'];
 }
 
 /** Редирект, если авторизованный пользователь попытается зайти на страницу авторизации */
-if (isset($_SESSION['login']) && isset($_SESSION['role'])) {
+if (isset($_SESSION['login']) && isset($_SESSION['role']) && $_SESSION['role'] !== 0) {
     redirectOnPage();
 }
 
 try {
     /** @noinspection PhpUndefinedVariableInspection */
     includeView('layout.head', ['title' => $title]);
-} catch (Exception $e) {
+} catch (Exception $exception) {
     echo $exception->getMessage() . ' ' . $exception->getCode();
 } ?>
 
@@ -44,7 +56,7 @@ try {
         <span class="text-success">
             <?= isset($_SESSION['password_reset']) ? 'Пароль сброшен' : '' ?>
         </span>
-        <span class="text-danger"><?= $error ?? '' ?></span>
+        <span class="text-danger"><?= DataException::$errors['auth'] ?? '' ?></span>
         <label for="inputEmail" class="sr-only">Email или логин</label>
         <input name="username" type="text" id="inputEmail" class="form-control mb-2" placeholder="Email или логин"
                required="" autofocus="" value="<?= $_POST['username'] ?? '' ?>">
@@ -60,7 +72,7 @@ try {
         <!--suppress HtmlUnknownTarget -->
         <a href="/auth/forget" class="signLink">Забыли пароль?</a>
     <?php
-    elseif (isset($param[0]) && isset($_SESSION['secret_code']) && isset($_POST['reset'])): ?>
+    elseif (isset($isCheckCode) && $isCheckCode): ?>
         <label for="newPassword" class="sr-only">Новый пароль</label>
         <input name="new_password" type="password" id="newPassword" class="form-control" placeholder="Новый пароль"
                required="" autofocus="">
@@ -68,10 +80,11 @@ try {
         <button name="reset" class="btn btn-lg btn-primary btn-block mt-2" type="submit">Сбросить</button>
         <!--suppress HtmlUnknownTarget -->
         <a href="/auth" class="signLink">Авторизоваться</a>  <?php
-    elseif (isset($param[0]) && isset($_SESSION['secret_code']) && isSessionLive() && !isset($success)) : ?>
+    elseif (isset($param[0]) && isset($_SESSION['secret_code']) && isSessionLive()) : ?>
         <label for="secret" class="sr-only">Код из письма</label>
-        <input name="secret" type="text" id="secret" class="form-control" placeholder="Код из письма" autofocus="">
-        <span class="text-danger"><?= $error ?? '' ?></span>
+        <input name="secret" type="text" id="secret" class="form-control" placeholder="Код из письма"
+               autofocus="">
+        <span class="text-danger"><?= DataException::$errors['code'] ?? '' ?></span>
         <button name="reset" class="btn btn-lg btn-primary btn-block mt-2" type="submit">Сбросить</button>
         <button name="new_code" class="btn btn-lg btn-secondary btn-block mt-2" type="submit">Новый код</button>
         <!--suppress HtmlUnknownTarget -->
@@ -80,7 +93,7 @@ try {
         <label for="inputEmail" class="sr-only">Email или логин</label>
         <input name="username" type="text" id="inputEmail" class="form-control mb-2" placeholder="Email или логин"
                required="" autofocus="" value="<?= $_POST['username'] ?? '' ?>">
-        <span class="text-danger"><?= $error ?? '' ?></span>
+        <span class="text-danger"><?= isset($exception) ? $exception->getMessage() : '' ?></span>
         <button name="forget_submit" class="btn btn-lg btn-primary btn-block" type="submit">Сбросить</button>
         <!--suppress HtmlUnknownTarget -->
         <a href="/auth" class="signLink">Авторизоваться</a>

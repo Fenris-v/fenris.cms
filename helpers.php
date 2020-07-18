@@ -63,9 +63,8 @@ function redirectOnPage($page = '/'): void
  * Для логов создается специальная папка log
  * @param string $filename - имя файла в который писать лог
  * @param $log - что писать
- * @param string $mode - мод для открытия файла
  */
-function logger(string $filename, $log, string $mode = 'w+'): void
+function logger(string $filename, $log): void
 {
     if (!file_exists(LOG_DIR) && !is_dir(LOG_DIR)) {
         mkdir(LOG_DIR);
@@ -75,9 +74,7 @@ function logger(string $filename, $log, string $mode = 'w+'): void
         arrayFormatForLog($log);
     }
 
-    $handle = fopen(LOG_DIR . $filename, $mode);
-    fwrite($handle, $log);
-    fclose($handle);
+    file_put_contents(LOG_DIR . $filename, date('d-m-Y H:i:s - ') . $log . '; ', FILE_APPEND | LOCK_EX);
 }
 
 /**
@@ -123,7 +120,7 @@ function getTemplateName(string $section, array $params): string
  */
 function mb_ucfirst(string $str)
 {
-    return mb_strtoupper(mb_substr($str, 0, 1)) . mb_substr($str, 1);
+    return mb_strtoupper(mb_substr($str, 0, 1)) . mb_strtolower(mb_substr($str, 1));
 }
 
 function cutStr(string $str, int $length = 20, string $replace = '...'): string

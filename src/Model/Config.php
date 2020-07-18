@@ -4,17 +4,20 @@ namespace App\Model;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property int|mixed val
+ */
 class Config extends Model
 {
     public $timestamps = false;
 
     /**
-     * Устанавливает размер страницы
+     * @param int $size
+     * @return $this
      */
-    public function setPageSize()
+    public function setVal(int $size): Config
     {
-        $perPage = $this::all()->where('name', 'per_page')->first();
-        $perPage->val = $_POST['per_page'];
-        $perPage->save();
+        $this->val = $size;
+        return $this;
     }
 }

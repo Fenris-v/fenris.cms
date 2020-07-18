@@ -1,14 +1,25 @@
 <?php
 
+use App\Controller\CategoryController;
+use App\Exception\DataException;
+use App\Exception\SaveException;
 use App\Model\Category;
 
-$categories = new Category();
+$categories = new CategoryController();
 
 if (!empty($_POST)) {
-    $error = $categories->changeCategory($data[0]);
+    try {
+        $error = $categories->changeCategory($data[0]);
+    } catch (DataException $exception) { ?>
+        <span class="text-danger"><?= DataException::$errors['category'] ?></span>
+        <?php
+    } catch (SaveException $exception) { ?>
+        <span class="text-danger"><?= $exception->getMessage() . ' - ' . $exception->getCode() ?></span>
+        <?php
+    }
 }
 
-$category = $categories::all()->where('id', $data[0])->first();
+$category = Category::all()->where('id', $data[0])->first();
 
 ?>
 <div class="row">
@@ -23,7 +34,9 @@ $category = $categories::all()->where('id', $data[0])->first();
                            id="name"
                            required
                            value="<?= $_POST['name'] ?? $category->name ?>">
-                    <span class="text-danger"><?= isset($error) ? $error : '' ?></span>
+                    <span class="text-danger"><?= isset(DataException::$errors['category'])
+                            ? DataException::$errors['category']
+                            : '' ?></span>
                 </div>
             </li>
             <li class="col-md-6">

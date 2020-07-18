@@ -2,121 +2,120 @@
 
 namespace App\Model;
 
-use App\Mail;
-
 /**
  * Модель статей
  * Class Article
+ * @property mixed|string title
+ * @property mixed|string uri
+ * @property mixed|string short_desc
+ * @property mixed|string text
+ * @property int|mixed author_id
+ * @property mixed|string image
+ * @property mixed|string meta_description
+ * @property mixed|string meta_title
+ * @property int|mixed top
+ * @property int|mixed category_id
  * @package App\Model
  */
 class Article extends Page
 {
     /**
-     * Проверяет данные для создания статьи
-     * @return array - массив с ошибками, если они есть
-     */
-    public function addArticle(): array
-    {
-        $title = mb_ucfirst(trim($_POST['name']));
-
-        $error = $this->checkData($title);
-
-        if (!empty($error)) {
-            return $error;
-        }
-
-        $alias = trim($_POST['alias']) !== '' ? $this->generateUri(trim($_POST['alias'])) : $this->generateUri($title);
-
-        $image = '';
-        if ($_FILES['image']['error'] === 0) {
-            $image = $this->uploadImage($_FILES['image'], $alias);
-        }
-
-        $article = new $this;
-        $this->saveData($article, (string)$title, (string)$alias, (string)$image);
-
-        (new Mail())->mailing((string) $alias);
-
-        return ['success' => 'yes'];
-    }
-
-    /**
-     * Редактирует статью
-     * @param int $id
-     * @return array
-     */
-    public function editArticle(int $id): array
-    {
-        $title = mb_ucfirst(trim($_POST['name']));
-
-        $error = $this->checkData($title);
-
-        if (!empty($error)) {
-            return $error;
-        }
-
-        $article = $this::all()->where('id', $id)->first();
-        $alias = trim($_POST['alias']) !== '' ? $this->generateUri(trim($_POST['alias']), $id) : $this->generateUri($title, $id);
-        if (isset($_POST['removeImage']) && $_POST['removeImage'] === 'on') {
-            $image = '';
-            $this->removeImage((string)$article->image);
-        } else {
-            $image = isset($_FILES['image']) && $_FILES['image']['error'] === 0 ? $this->uploadImage($_FILES['image'], $alias) : '';
-        }
-
-        $this->saveData($article, (string)$title, (string)$alias, (string)$image);
-
-        return $error;
-    }
-
-    /**
-     * Возвращает ошибки данных
      * @param string $title
-     * @return array
+     * @return $this
      */
-    private function checkData(string $title): array
+    public function setTitle(string $title): Article
     {
-        $error = [];
-
-        if (!$title) {
-            $error['title'] = 'Заголовок не может быть пустым';
-        }
-
-        if (!isset($_POST['category'])) {
-            $error['category'] = 'Не выбрана категория';
-        }
-
-        if (isset($_FILES['image']) && $_FILES['image']['error'] === 0) {
-            if ($_FILES['image']['size'] > IMAGE_MAX_SIZE_B) {
-                $error['image'] = 'Максимальный размер изображения ' . IMAGE_MAX_SIZE . 'мб';
-            } elseif (!in_array(mime_content_type($_FILES['image']['tmp_name']), ALLOWED_IMAGES)) {
-                $error['image'] = 'Недопустимое расширение файла';
-            }
-        }
-
-        return $error;
+        $this->title = $title;
+        return $this;
     }
 
     /**
-     * Сохраняет статью в БД
-     * @param $article
-     * @param string $title
      * @param string $alias
-     * @param string $image
+     * @return $this
      */
-    private function saveData($article, string $title, string $alias, string $image): void
+    public function setUri(string $alias): Article
     {
-        $article->title = $title;
-        $article->uri = $alias;
-        $article->short_desc = $_POST['description'];
-        $article->text = $_POST['text'];
-        $article->author_id = User::all()->where('login', $_SESSION['login'])->first()->id;
-        $article->image = $image;
-        $article->meta_description = $_POST['meta_description'];
-        $article->meta_title = $_POST['title'];
-        $article->top = isset($_POST['top']) ? 1 : 0;
-        $article->category_id = $_POST['category'];
+        $this->uri = $alias;
+        return $this;
+    }
 
-        $article->save();
+    /**
+     * @param string $desc
+     * @return $this
+     */
+    public function setShortDesc(string $desc): Article
+    {
+        $this->short_desc = $desc;
+        return $this;
+    }
+
+    /**
+     * @param string $text
+     * @return $this
+     */
+    public function setText(string $text): Article
+    {
+        $this->text = $text;
+        return $this;
+    }
+
+    /**
+     * @param int $authorId
+     * @return $this
+     */
+    public function setAuthor(int $authorId): Article
+    {
+        $this->author_id = $authorId;
+        return $this;
+    }
+
+    /**
+     * @param string $image
+     * @return $this
+     */
+    public function setImage(?string $image): Article
+    {
+        $this->image = $image;
+        return $this;
+    }
+
+    /**
+     * @param string $metaDescription
+     * @return $this
+     */
+    public function setMetaDescription(string $metaDescription): Article
+    {
+        $this->meta_description = $metaDescription;
+        return $this;
+    }
+
+    /**
+     * @param string $metaTitle
+     * @return $this
+     */
+    public function setMetaTitle(string $metaTitle): Article
+    {
+        $this->meta_title = $metaTitle;
+        return $this;
+    }
+
+    /**
+     * @param int $top
+     * @return $this
+     */
+    public function setTop(int $top): Article
+    {
+        $this->top = $top;
+        return $this;
+    }
+
+    /**
+     * @param int $categoryId
+     * @return $this
+     */
+    public function setCategory(int $categoryId): Article
+    {
+        $this->category_id = $categoryId;
+        return $this;
     }
 }

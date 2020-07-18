@@ -5,6 +5,10 @@ namespace App\Model;
 /**
  * Модель категорий
  * Class Category
+ * @property mixed|string name
+ * @property mixed|string uri
+ * @property mixed|string meta_title
+ * @property mixed|string meta_description
  * @package App\Model
  */
 class Category extends Page
@@ -13,68 +17,42 @@ class Category extends Page
     public $timestamps = false;
 
     /**
-     * Добавляет категорию
-     * @return string|null - ошибки, если они есть
-     */
-    public function addCategory(): ?string
-    {
-        $name = mb_ucfirst(trim($_POST['name']));
-
-        if (!$name) {
-            return 'Название не может быть пустым';
-        }
-
-        if ($this::all()->where('name', $name)->first() !== null) {
-            return 'Такая категория уже существует';
-        }
-
-        $alias = trim($_POST['alias']) !== '' ? $this->generateUri(trim($_POST['alias'])) : $this->generateUri($name);
-
-        $category = new $this;
-
-        $this->setData($category, $name, $alias);
-
-        redirectOnPage('/admin/articles/list');
-
-        return null;
-    }
-
-    /**
-     * Изменение категории
-     * @param int $id
-     * @return string|null
-     */
-    public function changeCategory(int $id): ?string
-    {
-        $name = mb_ucfirst(trim($_POST['name']));
-
-        if ($this::all()->where('id', '!=', $id)->where('name', $name)->first() !== null) {
-            return 'Такая категория уже существует';
-        }
-
-        $alias = trim($_POST['alias']) !== '' ? $this->generateUri(trim($_POST['alias']), $id) : $this->generateUri($name);
-
-        $category = $this::all()->where('id', $id)->first();
-
-        $this->setData($category, $name, $alias);
-
-        return null;
-    }
-
-    /**
-     * Сохраняет данные
-     * @param Category $category
      * @param string $name
-     * @param string $alias
-     * @noinspection PhpUndefinedFieldInspection
+     * @return $this
      */
-    private function setData(Category $category, string $name, string $alias): void
+    public function setName(string $name): Category
     {
-        $category->name = $name;
-        $category->uri = $alias;
-        $category->meta_title = $_POST['title'] ?? null;
-        $category->meta_description = $_POST['meta_description'] ?? null;
+        $this->name = $name;
+        return $this;
+    }
 
-        $category->save();
+    /**
+     * @param string $uri
+     * @return $this
+     */
+    public function setUri(string $uri): Category
+    {
+        $this->uri = $uri;
+        return $this;
+    }
+
+    /**
+     * @param string $title
+     * @return $this
+     */
+    public function setTitle(string $title): Category
+    {
+        $this->meta_title = $title;
+        return $this;
+    }
+
+    /**
+     * @param string $desc
+     * @return $this
+     */
+    public function setDesc(string $desc): Category
+    {
+        $this->meta_description = $desc;
+        return $this;
     }
 }

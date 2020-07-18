@@ -8,6 +8,7 @@ namespace App;
 
 use App\Model\Article;
 use App\Model\Category;
+use App\View\View;
 
 /**
  * Отсюда вызываются нужные для роутинга методы
@@ -18,104 +19,95 @@ class Controller
 {
     /**
      * Возвращает callback для главной страницы
-     * @return callable - callback
+     * @return View - callback
      */
-    public function index(): callable
+    public function index(): View
     {
-        return function ($params) {
-            return new View\View('index', ['title' => 'Главная страница', 'page' => $params]);
-        };
+        return new View('index', ['title' => 'Главная страница']);
     }
 
     /**
      * Возвращает callback для страниц категорий
-     * @return callable - callback
+     * @param $params
+     * @return View - callback
      */
-    public function categories(): callable
+    public function categories($params): View
     {
-        return function ($params) {
-            $category = new Category;
-            return new View\View(
-                'category.category',
-                [
-                    'title' => $category->getTitle($params[array_key_last($params)]),
-                    'metaDescription' => $category->getDescription($params[array_key_last($params)]),
-                    'param' => $params
-                ]
-            );
-        };
+        $category = new Category;
+        return new View(
+            'category.category',
+            [
+                'title' => $category->getTitle($params[0]),
+                'metaDescription' => $category->getDescription($params[0]),
+                'param' => $params
+            ]
+        );
     }
 
     /**
      * Возвращает callback для страницы статьи
-     * @return callable - callback
+     * @param $params
+     * @return View - callback
      */
-    public function article(): callable
+    public function article($params): View
     {
-        return function ($params) {
-            $article = new Article();
-            return new View\View(
-                'article.article', [
+        $article = new Article();
+        return new View(
+            'article.article',
+            [
                 'title' => $article->getTitle($params[array_key_last($params)]),
                 'metaDescription' => $article->getDescription($params[array_key_last($params)]),
                 'param' => $params
             ]
-            );
-        };
+        );
     }
 
     /**
      * Возвращает callback для страниц админки
-     * @return callable
+     * @param $params
+     * @return View
      */
-    public function admin(): callable
+    public function admin($params): View
     {
-        return function ($params) {
-            return new View\View('admin.index', ['params' => $params]);
-        };
+        return new View('admin.index', ['params' => $params]);
     }
 
     /**
      * Возвращает callback для страницы авторизации
-     * @return callable - callback
+     * @param $params
+     * @return View - callback
      */
-    public function auth(): callable
+    public function auth($params): View
     {
-        return function ($params = '') {
-            return new View\View('auth.auth', ['title' => 'Авторизация', 'param' => $params]);
-        };
+        return new View('auth.auth', ['title' => 'Авторизация', 'param' => $params]);
     }
 
     /**
      * Возвращает callback для страницы правил
-     * @return callable - callback
+     * @param $params
+     * @return View - callback
      */
-    public function rules(): callable
+    public function rules($params): View
     {
-        return function ($params = '') {
-            return new View\View('rules.rules', ['title' => 'Правила пользования сайтом', 'param' => $params]);
-        };
+        return new View('rules.rules', ['title' => 'Правила пользования сайтом', 'param' => $params]);
     }
 
     /**
      * Возвращает callback для страницы регистрации
-     * @return callable - callback
+     * @return View
      */
-    public function reg(): callable
+    public function reg(): View
     {
-        return function () {
-            return new View\View('reg.reg', ['title' => 'Регистрация']);
-        };
+        return new View('reg.reg', ['title' => 'Регистрация']);
     }
 
     /**
      * Возвращает callback для страницы личного кабинета
-     * @return callable - callback
+     * @param $params
+     * @return View - callback
      */
-    public function profile(): callable
+    public function profile($params): View
     {
-        return function ($params) {
-            return new View\View('lk.profile', ['title' => 'Личный кабинет', 'param' => $params]);
-        };
+        return new View('lk.profile', ['title' => 'Личный кабинет', 'param' => $params]);
     }
 }

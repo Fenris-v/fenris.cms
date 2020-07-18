@@ -1,15 +1,22 @@
 <?php
 
+use App\Controller\UserController;
+use App\Exception\DataException;
+use App\Exception\SaveException;
 use App\Model\Role;
 use App\Model\User;
 
-$user = new User();
-
 if (!empty($_POST)) {
-    $error = $user->setNewData($data[0]);
+    try {
+        (new UserController())->setNewData($data[0]);
+    } catch (DataException $exception) {
+    } catch (SaveException $exception) { ?>
+        <span class="text-danger"><?= $exception->getMessage() ?></span>
+        <?php
+    }
 }
 
-$user = $user::all()->where('id', $data[0])->first();
+$user = User::all()->where('id', $data[0])->first();
 ?>
 
 <div class="row">
@@ -27,26 +34,26 @@ $user = $user::all()->where('id', $data[0])->first();
             </li>
             <li class="col-md-6">
                 <div class="form-group">
-                    <label for="login">Логин</label>
-                    <input name="login"
+                    <label for="username">Логин</label>
+                    <input name="username"
                            type="text"
                            class="form-control"
-                           id="login"
+                           id="username"
                            required
                            value="<?= $_POST['login'] ?? $user->login ?>">
-                    <span class="text-danger"><?= isset($error['login']) ? $error['login'] : '' ?></span>
+                    <span class="text-danger"><?= DataException::$errors['login'] ?? '' ?></span>
                 </div>
             </li>
             <li class="col-md-6">
                 <div class="form-group">
-                    <label for="mail">Email</label>
-                    <input name="mail"
+                    <label for="email">Email</label>
+                    <input name="email"
                            type="email"
                            class="form-control"
-                           id="mail"
+                           id="email"
                            required
                            value="<?= $_POST['mail'] ?? $user->mail ?>">
-                    <span class="text-danger"><?= isset($error['mail']) ? $error['mail'] : '' ?></span>
+                    <span class="text-danger"><?= DataException::$errors['mail'] ?? '' ?></span>
                 </div>
             </li>
             <li class="col-md-6">
@@ -56,7 +63,7 @@ $user = $user::all()->where('id', $data[0])->first();
                         <?php
                         foreach (Role::all() as $role): ?>
                             <option value="<?= $role->id ?>" <?=
-                            (int) $_SESSION['role'] === (int) $role->id ? 'selected' : ''
+                            (int)$_SESSION['role'] === (int)$role->id ? 'selected' : ''
                             ?>><?= $role->name ?></option>
                         <?php
                         endforeach; ?>

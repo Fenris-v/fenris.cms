@@ -1,15 +1,26 @@
 <?php
 
+use App\Controller\ArticleController;
+use App\Exception\DataException;
+use App\Exception\SaveException;
 use App\Model\Article;
 use App\Model\Category;
 
-$article = new Article();
+$article = new ArticleController();
 
 if (!empty($_POST)) {
-    $error = $article->editArticle((int)$data[0]);
+    try {
+        $error = $article->editArticle((int)$data[0]);
+    } catch (DataException $exception) { ?>
+        <span class="text-danger"><?= $exception->getMessage() ?></span>
+        <?php
+    } catch (SaveException $exception) { ?>
+        <span class="text-danger"><?= $exception->getMessage() . ' - ' . $exception->getCode() ?></span>
+        <?php
+    }
 }
 
-$article = $article::all()->where('id', $data[0])->first(); ?>
+$article = Article::all()->where('id', $data[0])->first(); ?>
 
 <div class="row">
     <form class="col-md-12" action="" method="post" enctype="multipart/form-data">
@@ -23,7 +34,9 @@ $article = $article::all()->where('id', $data[0])->first(); ?>
                            id="name"
                            required
                            value="<?= $article->title ?>">
-                    <span class="text-danger"><?= isset($error['title']) ? $error['title'] : '' ?></span>
+                    <span class="text-danger"><?= isset(DataException::$errors['title'])
+                            ? DataException::$errors['title']
+                            : '' ?></span>
                 </div>
             </li>
             <li class="col-md-6">
@@ -75,7 +88,9 @@ $article = $article::all()->where('id', $data[0])->first(); ?>
                         <?php
                         endforeach; ?>
                     </select>
-                    <span class="text-danger"><?= isset($error['category']) ? $error['category'] : '' ?></span>
+                    <span class="text-danger"><?= isset(DataException::$errors['category'])
+                            ? DataException::$errors['category']
+                            : '' ?></span>
                 </div>
             </li>
             <li class="col-md-6">
@@ -98,7 +113,9 @@ $article = $article::all()->where('id', $data[0])->first(); ?>
                                class="form-control-file"
                                id="image"
                                accept="image/png, image/jpeg, image/jpg, image/gif">
-                        <span class="text-danger"><?= $article->image ?></span>
+                        <span class="text-danger"><?= isset(DataException::$errors['image'])
+                                ? DataException::$errors['image']
+                                : '' ?></span>
                     <?php
                     endif; ?>
                 </div>

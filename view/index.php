@@ -24,7 +24,7 @@ try {
                 <div class="col-md-12 blog-main">
                     <?php
                     try {
-                        includeView('render.articleList', ['page' => $page]);
+                        includeView('render.articleList', ['page' => $page ?? '']);
                     } catch (Exception $exception) {
                         echo $exception->getMessage() . ' ' . $exception->getCode();
                     }

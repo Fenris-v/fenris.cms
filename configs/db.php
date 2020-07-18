@@ -1,6 +1,6 @@
 <?php
 
-return $dbConfig = [
+return [
     'host' => 'localhost',
     'user' => 'admin',
     'password' => '8lXQoS03F0PLtSVZ',

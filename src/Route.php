@@ -10,7 +10,7 @@ class Route
 {
     private string $method;
     private string $path;
-    private object $callback;
+    private $callback;
 
     public function __construct(string $method, string $path, $callback)
     {
@@ -32,7 +32,7 @@ class Route
      * Возвращает соответствующий callback
      * @return mixed
      */
-    public function getCallback(): object
+    public function getCallback()
     {
         return $this->callback;
     }
@@ -45,6 +45,9 @@ class Route
      */
     public function match($method, $uri): bool
     {
+        if (stripos($uri, '?')) {
+            $uri = stristr($uri, '?', true);
+        }
         return $this->method === $method &&
             preg_match('/^' . str_replace(['*', '/'], ['(\w+-?)+', '\/'], $this->getPath()) . '$/', $uri);
     }
@@ -56,7 +59,7 @@ class Route
      */
     public function run(string $uri)
     {
-        $callback = $this->prepareCallback($this->getCallback());
+        list($class, $method) = explode('@', $this->getCallback());
 
         $urlParts = explode('/', $uri);
         $routeParts = explode('/', $this->getPath());
@@ -67,22 +70,7 @@ class Route
                 $params[] = $urlParts[$key];
             }
         }
-        return call_user_func_array($callback, [$params]);
-    }
 
-    /**
-     * Подготавливает анонимную функцию к запуску и возвращает ее
-     * @param $callback - объект, который нужно подготовить
-     * @return callable - готовая к запуску анонимная функция
-     */
-    private function prepareCallback($callback): callable
-    {
-        if (is_array($callback)) {
-            $class = new $callback['class'];
-            $method = $callback['method'];
-            return $class->$method();
-        }
-
-        return $callback;
+        return (new $class)->$method($params);
     }
 }

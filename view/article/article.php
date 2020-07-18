@@ -1,5 +1,7 @@
 <?php
 
+use App\Controller\CommentController;
+use App\Exception\SaveException;
 use App\Model\Article;
 use App\Model\Category;
 use App\Model\Comment;
@@ -9,15 +11,27 @@ use App\Model\User;
 $article = Article::all()->where('uri', $param[array_key_last($param)])->first();
 
 if (isset($_POST['approve'])) {
-    (new Comment())->approveComment();
+    try {
+        (new CommentController())->approveComment();
+    } catch (SaveException $exception) {
+        $error = $exception->getMessage();
+    }
 }
 
 if (isset($_POST['delete'])) {
-    (new Comment())->removeComment();
+    try {
+        (new CommentController())->removeComment();
+    } catch (SaveException $exception) {
+        $error = $exception->getMessage();
+    }
 }
 
 if (isset($_POST['comment']) && trim($_POST['comment']) !== '' && isset($_SESSION['login'])) {
-    (new Comment())->saveComment($article->id);
+    try {
+        (new CommentController())->saveComment($article->id);
+    } catch (SaveException $exception) {
+        $error = $exception->getMessage();
+    }
     redirectOnPage($_SERVER['REQUEST_URI']);
 }
 
@@ -102,6 +116,7 @@ try {
                                             ->login ?></b> <?= $comment->created_at ?></p>
                                 <p class="mb-2"><?= $comment->getOriginal('text') ?></p>
                                 <form method="post">
+                                    <!--suppress HtmlFormInputWithoutLabel -->
                                     <input name="commentId"
                                            type="text"
                                            class="d-none"
@@ -155,6 +170,7 @@ try {
                           id="description"><?= $_POST['comment'] ?? '' ?></textarea>
                 <?= isset($_POST['comment']) && !isset($_SESSION['login'])
                     ? '<span class="text-danger">Комментарии могут оставлять только авторизованные пользователи</span><br>' : '' ?>
+                <span class="text-danger"><?= $error ?? '' ?></span>
                 <input class="btn-primary btn" type="submit" value="Отправить">
             </form>
         </div>

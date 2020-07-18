@@ -27,5 +27,5 @@ interface GetPage
      * @param string $str - строка на русском/английском
      * @return string
      */
-    public function generateUri(string $str): string;
+//    public function generateUri(string $str): string;
 }

@@ -1,13 +1,22 @@
 <?php
 
-use App\Model\Article;
+use App\Controller\ArticleController;
+use App\Exception\DataException;
+use App\Exception\SaveException;
 use App\Model\Category;
 
 if (!empty($_POST)) {
-    $article = new Article();
-    $error = $article->addArticle();
+    try {
+        $success = (new ArticleController())->addArticle();
+    } catch (DataException $exception) { ?>
+        <span class="text-danger"><?= $exception->getMessage() ?></span>
+        <?php
+    } catch (SaveException $exception) { ?>
+        <span class="text-danger"><?= $exception->getMessage() . ' - ' . $exception->getCode() ?></span>
+        <?php
+    }
 
-    if (isset($error['success']) && $error['success'] === 'yes'): ?>
+    if ($success): ?>
         <script>
             window.location.href = window.location.origin + '/admin/articles'
         </script>
@@ -16,6 +25,7 @@ if (!empty($_POST)) {
 } ?>
 
 <div class="row">
+    <span class="text-danger"><?= isset($dataException) ? $dataException : '' ?></span>
     <form class="col-md-12" action="" method="post" enctype="multipart/form-data">
         <ul class="col-md-12 d-flex align-items-start flex-wrap">
             <li class="col-md-6">
@@ -27,7 +37,9 @@ if (!empty($_POST)) {
                            id="name"
                            required
                            value="<?= $_POST['name'] ?? '' ?>">
-                    <span class="text-danger"><?= isset($error['title']) ? $error['title'] : '' ?></span>
+                    <span class="text-danger"><?= isset(DataException::$errors['title'])
+                            ? DataException::$errors['title']
+                            : '' ?></span>
                 </div>
             </li>
             <li class="col-md-6">
@@ -81,7 +93,9 @@ if (!empty($_POST)) {
                         <?php
                         endforeach; ?>
                     </select>
-                    <span class="text-danger"><?= isset($error['category']) ? $error['category'] : '' ?></span>
+                    <span class="text-danger"><?= isset(DataException::$errors['category'])
+                            ? DataException::$errors['category']
+                            : '' ?></span>
                 </div>
             </li>
             <li class="col-md-6">
@@ -92,7 +106,9 @@ if (!empty($_POST)) {
                            class="form-control-file"
                            id="image"
                            accept="image/png, image/jpeg, image/jpg, image/gif">
-                    <span class="text-danger"><?= isset($error['image']) ? $error['image'] : '' ?></span>
+                    <span class="text-danger"><?= isset(DataException::$errors['image'])
+                            ? DataException::$errors['image']
+                            : '' ?></span>
                 </div>
             </li>
             <li class="col-md-12">
