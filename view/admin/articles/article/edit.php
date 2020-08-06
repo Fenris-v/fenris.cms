@@ -8,9 +8,9 @@ use App\Model\Category;
 
 $article = new ArticleController();
 
-if (!empty($_POST)) {
+if (!empty($_POST) && isset($data)) {
     try {
-        $error = $article->editArticle((int)$data[0]);
+        $article->editArticle((int)$data[0]);
     } catch (DataException $exception) { ?>
         <span class="text-danger"><?= $exception->getMessage() ?></span>
         <?php
@@ -20,6 +20,7 @@ if (!empty($_POST)) {
     }
 }
 
+/** @noinspection PhpUndefinedVariableInspection */
 $article = Article::all()->where('id', $data[0])->first(); ?>
 
 <div class="row">

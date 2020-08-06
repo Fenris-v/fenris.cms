@@ -4,7 +4,7 @@ use App\Controller\ConfigController;
 use App\Model\Article;
 use App\Model\Category;
 
-if ($data[0] === 'list') {
+if (isset($data) && $data[0] === 'list') {
     redirectOnPage($_SERVER['REQUEST_URI'] . '/' . Category::all()->first()->uri);
 }
 

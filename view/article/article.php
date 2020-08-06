@@ -101,7 +101,10 @@ try {
             $comments = Comment::all()->where('article_id', $article->id);
             $user = new User();
 
-            if ($user->isManager() || $user->isSuperUser()):
+            if (
+                (isset($_SESSION['login']) && isset($_SESSION['role']) && !isset($_SESSION['secret_code'])) &&
+                ($user->isManager() || $user->isSuperUser())
+            ):
                 if ($comments->first() === null): ?>
                     <p>К этой статье пока не оставляли комментариев</p>
                 <?php

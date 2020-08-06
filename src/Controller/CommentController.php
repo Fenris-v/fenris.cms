@@ -11,10 +11,9 @@ class CommentController extends PageController
     /**
      * Добавляет комментарий
      * @param int $articleId
-     * @return bool
      * @throws SaveException
      */
-    public function saveComment(int $articleId): bool
+    public function saveComment(int $articleId): void
     {
         $user = new User();
 
@@ -30,19 +29,19 @@ class CommentController extends PageController
             throw new SaveException('Ошибка сохранения данных', 500);
         }
 
-        return $success;
+        redirectOnPage($_SERVER['REQUEST_URI']);
     }
 
     /**
      * Подтверждает комментарий
      * @throws SaveException
      */
-    public function approveComment(): bool
+    public function approveComment(): void
     {
         $comment = Comment::all()->where('id', $_POST['commentId'])->first();
 
         if ($comment === null) {
-            return false;
+            throw new SaveException('Ошибка сохранения данных', 500);
         }
 
         $comment->setApprove(1);
@@ -51,20 +50,19 @@ class CommentController extends PageController
         if (!$success) {
             throw new SaveException('Ошибка сохранения данных', 500);
         }
-
-        return $success;
+        redirectOnPage($_SERVER['REQUEST_URI']);
     }
 
     /**
      * Удаляет комментарий
      * @throws SaveException
      */
-    public function removeComment(): bool
+    public function removeComment(): void
     {
         $comment = Comment::all()->where('id', $_POST['commentId'])->first();
 
         if ($comment === null) {
-            return false;
+            throw new SaveException('Ошибка удаления', 500);
         }
 
         $success = $comment->delete();
@@ -72,7 +70,6 @@ class CommentController extends PageController
         if (!$success) {
             throw new SaveException('Ошибка удаления', 500);
         }
-
-        return $success;
+        redirectOnPage($_SERVER['REQUEST_URI']);
     }
 }

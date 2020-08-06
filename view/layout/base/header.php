@@ -6,7 +6,6 @@ use App\Exception\SaveException;
 use App\Model\Subscribe;
 use App\Model\User;
 
-
 if (isset($_GET['unsubscribe'])) {
     try {
         (new SubscribeController())->unsubscribe();
@@ -81,7 +80,7 @@ if (isset($_GET['unsubscribe'])) {
 
                 <a class="btn btn-primary"
                    href="<?= isset($_SESSION['login']) && isset($_SESSION['role']) && !isset($_SESSION['secret_code'])
-                       ? '?logout' : '/auth' ?>">
+                       ? '/?logout' : '/auth' ?>">
                     <?= isset($_SESSION['login']) && isset($_SESSION['role']) && !isset($_SESSION['secret_code'])
                         ? 'Выйти' : 'Войти' ?>
                 </a>

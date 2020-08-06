@@ -7,18 +7,20 @@ use App\Exception\SaveException;
 use App\Mail;
 use App\Model\Article;
 use App\Model\User;
+use App\Traits\UploadImage;
 
 class ArticleController extends PageController
 {
+    use UploadImage;
+
     public static array $errors;
 
     /**
      * Вызывает данные для проверки и добавления новой статьи
-     * @return bool - успешное сохранение
      * @throws SaveException
      * @throws DataException
      */
-    public function addArticle(): bool
+    public function addArticle(): void
     {
         $title = mb_ucfirst(trim($_POST['name']));
 
@@ -36,7 +38,13 @@ class ArticleController extends PageController
 
         $image = '';
         if ($_FILES['image']['error'] === 0) {
-            $image = $this->uploadImage($_FILES['image'], $alias);
+            $image = $this->uploadImage($_FILES['image'], $alias, IMAGE_UPLOAD_DIR);
+        }
+
+        $userId = $this->getCurrentUserId();
+
+        if ($userId === 0) {
+            throw new SaveException('Ошибка сохранения данных', 500);
         }
 
         $success = $this->setData($article, $title, $alias, $image, $this->getCurrentUserId());
@@ -47,17 +55,16 @@ class ArticleController extends PageController
 
         (new Mail())->mailing((string)$alias);
 
-        return true;
+        redirectOnPage('/admin/articles');
     }
 
     /**
      * Редактирует статью
      * @param int $id
-     * @return bool
      * @throws DataException
      * @throws SaveException
      */
-    public function editArticle(int $id): bool
+    public function editArticle(int $id): void
     {
         $title = mb_ucfirst(trim($_POST['name']));
 
@@ -77,7 +84,7 @@ class ArticleController extends PageController
             $article->setImage(null);
         } else {
             $image = isset($_FILES['image']) && $_FILES['image']['error'] === 0
-                ? $this->uploadImage($_FILES['image'], $alias) : '';
+                ? $this->uploadImage($_FILES['image'], $alias, IMAGE_UPLOAD_DIR) : '';
         }
 
         $success = $this->setData(
@@ -92,7 +99,7 @@ class ArticleController extends PageController
             throw new SaveException('Ошибка сохранения данных', 500);
         }
 
-        return true;
+        redirectOnPage($_SERVER['REQUEST_URI']);
     }
 
     /**

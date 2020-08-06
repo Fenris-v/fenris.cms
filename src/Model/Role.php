@@ -21,7 +21,7 @@ class Role extends Model
         return $this::all()
             ->where('id', $roleId)
             ->first()
-            ->role;
+            ->role ?? '';
     }
 
     public function getRoleVisibleName($roleId): string

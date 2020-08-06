@@ -50,43 +50,6 @@ function includeView(string $templateName, array $data = [])
 }
 
 /**
- * Выполняет редирект на указанную страницу
- * @param string $page - страница для перенаправления, по умолчанию - главная
- */
-function redirectOnPage($page = '/'): void
-{
-    header('location: ' . $page);
-}
-
-/**
- * Функция для логирования
- * Для логов создается специальная папка log
- * @param string $filename - имя файла в который писать лог
- * @param $log - что писать
- */
-function logger(string $filename, $log): void
-{
-    if (!file_exists(LOG_DIR) && !is_dir(LOG_DIR)) {
-        mkdir(LOG_DIR);
-    }
-
-    if (!is_string($log)) {
-        arrayFormatForLog($log);
-    }
-
-    file_put_contents(LOG_DIR . $filename, date('d-m-Y H:i:s - ') . $log . '; ', FILE_APPEND | LOCK_EX);
-}
-
-/**
- * Преобразование массива в строку
- * @param $log - массив
- */
-function arrayFormatForLog(array &$log): void
-{
-    $log = json_encode($log, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-}
-
-/**
  * Проверяет действителен ли код для подтверждения регистрации
  * @return bool - действителен ли код
  */
@@ -123,7 +86,23 @@ function mb_ucfirst(string $str)
     return mb_strtoupper(mb_substr($str, 0, 1)) . mb_strtolower(mb_substr($str, 1));
 }
 
+/**
+ * Обрезает строку
+ * @param string $str
+ * @param int $length
+ * @param string $replace
+ * @return string
+ */
 function cutStr(string $str, int $length = 20, string $replace = '...'): string
 {
     return mb_strimwidth($str, 0, ($length + strlen($replace)), $replace);
+}
+
+/**
+ * Выполняет редирект на указанную страницу
+ * @param string $page - страница для перенаправления, по умолчанию - главная
+ */
+function redirectOnPage($page = '/'): void
+{
+    header('location: ' . $page);
 }

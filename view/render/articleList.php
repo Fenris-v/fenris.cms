@@ -12,6 +12,7 @@ $articlesCount = $categoryId
     : Article::all()->count();
 
 $perPage = Config::all()->where('name', 'per_page')->first()->val;
+
 if ($perPage === 'all' || !$perPage) {
     $articles = $categoryId
         ? Article::all()->where('category_id', $categoryId)->sortByDesc('created_at')

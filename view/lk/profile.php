@@ -6,10 +6,10 @@ use App\Exception\SaveException;
 use App\Model\User;
 
 if (!empty($_POST)) {
-    if (isset($_POST['upload']) && $_FILES['image']['error'] === 0) {
+    if (isset($_POST['upload'])) {
         try {
             /** @noinspection PhpUndefinedVariableInspection */
-            $error = (new UserController())->uploadAvatar($param[array_key_last($param)]);
+            (new UserController())->uploadAvatar($param[array_key_last($param)]);
         } catch (DataException $exception) {
         } catch (SaveException $exception) { ?>
             <span class="text-danger"><?= $exception->getMessage() . ' - ' . $exception->getCode() ?></span>
@@ -19,7 +19,7 @@ if (!empty($_POST)) {
         try {
             /** @noinspection PhpUndefinedVariableInspection */
             (new UserController())->removeAvatar($param[array_key_last($param)]);
-        } catch (SaveException $e) { ?>
+        } catch (SaveException $exception) { ?>
             <span class="text-danger"><?= $exception->getMessage() . ' - ' . $exception->getCode() ?></span>
             <?php
         }
@@ -101,7 +101,7 @@ try {
                       class="col-md-12 d-flex justify-content-center flex-column align-items-center" action=""
                       method="post">
                     <img class="rounded-circle mb-3 avatar"
-                         src="<?= $user->avatar !== '' ? $user->avatar : '/templates/images/logo.jpeg' ?>"
+                         src="<?= $user->avatar ? $user->avatar : '/templates/images/logo.jpeg' ?>"
                          alt="user">
                     <?php
                     if (!$user->avatar): ?>
@@ -109,7 +109,8 @@ try {
                                type="file"
                                class="form-control-file mb-3 avatarUpload"
                                id="image"
-                               accept="image/png, image/jpeg, image/jpg, image/gif">
+                               accept="image/png, image/jpeg, image/jpg, image/gif"
+                               required>
                         <span class="text-danger"><?= isset(DataException::$errors['image'])
                                 ? DataException::$errors['image']
                                 : '' ?></span>

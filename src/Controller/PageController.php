@@ -6,6 +6,7 @@ class PageController extends Controller
 {
     /**
      * Транслит для генерации alias
+     * @param $page
      * @param string $str - строка на русском/английском
      * @param int $id
      * @return string
@@ -62,35 +63,6 @@ class PageController extends Controller
     }
 
     /**
-     * Загружает изображение на сервер и возвращает путь к загруженной картинке
-     * @param $image
-     * @param $name
-     * @return string
-     */
-    protected function uploadImage(array $image, string $name): string
-    {
-        if (!file_exists(IMAGE_DIR)) {
-            mkdir(IMAGE_DIR);
-        }
-
-        if (!file_exists(IMAGE_UPLOAD_DIR)) {
-            mkdir(IMAGE_UPLOAD_DIR);
-        }
-
-        $partsName = explode('.', $image['name']);
-        $format = $partsName[array_key_last($partsName)];
-        $name .= '.' . $format;
-
-        if (in_array($name, scandir(IMAGE_UPLOAD_DIR))) {
-            unlink(IMAGE_UPLOAD_DIR . $name);
-        }
-
-        move_uploaded_file($image['tmp_name'], IMAGE_UPLOAD_DIR . $name);
-
-        return IMAGE_PATH . $name;
-    }
-
-    /**
      * Удаляет изображение
      * @param string $image
      */
@@ -99,5 +71,7 @@ class PageController extends Controller
         if ($image && file_exists($_SERVER['DOCUMENT_ROOT'] . $image)) {
             unlink($_SERVER['DOCUMENT_ROOT'] . $image);
         }
+
+        redirectOnPage($_SERVER['REQUEST_URI']);
     }
 }

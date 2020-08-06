@@ -125,11 +125,23 @@ final class User extends Model
     }
 
     /**
+     * Возвращает id текущего пользователя
+     * @return int
+     */
+    public function getThisUserId(): int
+    {
+        return $this::all()
+            ->where('login', $_SESSION['login'])
+            ->first()
+            ->id;
+    }
+
+    /**
      * Возвращает название роли
      * @param int $id
-     * @return string
+     * @return int
      */
-    public function getRoleName(int $id): string
+    public function getRoleName(int $id): int
     {
         return (new Role())->getRoleVisibleName(
             $this::all()
@@ -171,14 +183,24 @@ final class User extends Model
      */
     public function getRoleId(): int
     {
-        return (int)$this::all()->where('login', $_SESSION['login'])->first()->role_id;
+        return $this::all()->where('login', $_SESSION['login'])->first()->role_id ?? 0;
+    }
+
+    /**
+     * Возвращает id роли пользователя по его id
+     * @param int $id - id пользователя
+     * @return int
+     */
+    public function getRoleByUserId(int $id): int
+    {
+        return $this::all()->where('id', $id)->first()->role_id ?? 0;
     }
 
     /**
      * Возвращает роль пользователя
-     * @return int
+     * @return string
      */
-    private function getUserRole(): int
+    private function getUserRole(): string
     {
         if (isset($_SESSION['login'])) {
             return (new Role())->getRoleName(
@@ -188,7 +210,6 @@ final class User extends Model
                     ->role_id
             );
         }
-
-        return 0;
+        return 'guest';
     }
 }

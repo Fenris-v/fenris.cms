@@ -1,8 +1,6 @@
 <?php
 
-
 namespace App\Controller;
-
 
 use App\Exception\DataException;
 use App\Exception\SaveException;
@@ -17,9 +15,9 @@ class SubscribeController
      * @throws SaveException
      * @throws DataException
      */
-    public function changeSubscribe(): bool
+    public function changeSubscribe(): void
     {
-        if (isset($_SESSION['login'])) {
+        if (isset($_SESSION['login']) && !isset($_SESSION['secret_code'])) {
             $userMail = User::all()
                 ->where('login', $_SESSION['login'])
                 ->first()
@@ -31,7 +29,7 @@ class SubscribeController
                 $success = $subscribe->delete();
             } else {
                 if (Subscribe::all()->where('mail', $userMail)->first() !== null) {
-                    return true;
+                    return;
                 }
 
                 $subscribe = (new Subscribe())
@@ -43,7 +41,7 @@ class SubscribeController
                 throw new SaveException('Ошибка сохранения данных', 500);
             }
 
-            return true;
+            return;
         }
 
         if (isset($_POST['subscribe'])) {
@@ -62,23 +60,21 @@ class SubscribeController
             if (!$success) {
                 throw new SaveException('Ошибка сохранения данных', 500);
             }
-
-            return true;
         }
 
-        return false;
+        redirectOnPage($_SERVER['REQUEST_URI']);
     }
 
     /**
      * Отписывает от рассылки по ссылке
      * @throws SaveException
      */
-    public function unsubscribe(): bool
+    public function unsubscribe(): void
     {
         $subscribe = Subscribe::all()->where('id', $_GET['id'])->where('mail', $_GET['mail'])->first();
 
         if ($subscribe === null) {
-            return true;
+            throw new SaveException('Ошибка сохранения данных', 500);
         }
 
         $success = $subscribe->delete();
@@ -87,6 +83,6 @@ class SubscribeController
             throw new SaveException('Ошибка сохранения данных', 500);
         }
 
-        return true;
+        redirectOnPage($_SERVER['REQUEST_URI']);
     }
 }

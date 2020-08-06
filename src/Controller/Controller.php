@@ -12,6 +12,6 @@ class Controller
      */
     protected function getCurrentUserId(): int
     {
-        return User::all()->where('login', $_SESSION['login'])->first()->id;
+        return User::all()->where('login', $_SESSION['login'])->first()->id ?? 0;
     }
 }

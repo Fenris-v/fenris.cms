@@ -1,9 +1,5 @@
 <?php
 
-/**
- * На данный момент нигде не применяется
- */
-
 namespace App;
 
 use App\Model\Article;
@@ -21,9 +17,9 @@ class Controller
      * Возвращает callback для главной страницы
      * @return View - callback
      */
-    public function index(): View
+    public function index($params): View
     {
-        return new View('index', ['title' => 'Главная страница']);
+        return new View('index', ['title' => 'Главная страница', 'page' => $params]);
     }
 
     /**

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: localhost
--- Время создания: Июл 24 2020 г., 23:12
+-- Время создания: Авг 03 2020 г., 22:24
 -- Версия сервера: 10.4.11-MariaDB
 -- Версия PHP: 7.4.6
 
@@ -128,7 +128,8 @@ CREATE TABLE `comments` (
 
 INSERT INTO `comments` (`id`, `text`, `approve`, `article_id`, `user_id`, `updated_at`, `created_at`) VALUES
 (1, 'Интересно!', 1, 5, 1, '2020-07-09 20:39:11', '2020-07-09 20:39:11'),
-(12, 'круто', 0, 18, 2, '2020-07-24 23:08:06', '2020-07-24 23:07:51');
+(12, 'круто', 0, 18, 2, '2020-07-24 23:08:06', '2020-07-24 23:07:51'),
+(13, 'asdadsad', 1, 18, 1, '2020-08-01 00:02:41', '2020-08-01 00:02:41');
 
 -- --------------------------------------------------------
 
@@ -233,7 +234,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `mail`, `login`, `password`, `about`, `avatar`, `role_id`, `password_token`, `created_at`, `updated_at`) VALUES
-(1, 'Николай', 'admin@gmail.com', 'admin', '$2y$10$PKB3.PXU/U6I0N2dRPVJV.dZEOGiwMwTlpwr7JZol68uPRe.jHfza', 'Boss', '/templates/images/avatar/admin.jpg', 1, NULL, NULL, '2020-07-24 01:12:36'),
+(1, 'Николай', 'admin@gmail.com', 'admin', '$2y$10$PKB3.PXU/U6I0N2dRPVJV.dZEOGiwMwTlpwr7JZol68uPRe.jHfza', 'Boss', '/templates/images/avatar/admin.jpg', 1, NULL, NULL, '2020-08-01 00:04:18'),
 (2, 'Анатолий', 'user@gmail.com', 'user', '$2y$10$NHfDnmbyPL5LDg/RPYzkkuOFTVnK5KSwC13LwzTer2nw7OM72Zpy.', NULL, NULL, 3, NULL, NULL, NULL),
 (3, 'Виктория', 'manager@gmail.com', 'manager', '$2y$10$BrgZOT7hOylxmaTewSoPlOfQabv0Yim6kl3pKjwxbDqjfsm5N5/rS', NULL, NULL, 1, NULL, NULL, '2020-07-04 18:46:35');
 
@@ -326,19 +327,19 @@ ALTER TABLE `admin_pages`
 -- AUTO_INCREMENT для таблицы `articles`
 --
 ALTER TABLE `articles`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT для таблицы `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT для таблицы `comments`
 --
 ALTER TABLE `comments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT для таблицы `configs`
@@ -362,7 +363,7 @@ ALTER TABLE `subscribes`
 -- AUTO_INCREMENT для таблицы `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- Ограничения внешнего ключа сохраненных таблиц

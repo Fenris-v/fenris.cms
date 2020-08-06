@@ -4,9 +4,10 @@ use App\Controller\UserController;
 use App\Exception\DataException;
 use App\Exception\SaveException;
 use App\Model\Role;
+use App\Model\Subscribe;
 use App\Model\User;
 
-if (!empty($_POST)) {
+if (!empty($_POST) && isset($data)) {
     try {
         (new UserController())->setNewData($data[0]);
     } catch (DataException $exception) {
@@ -16,6 +17,7 @@ if (!empty($_POST)) {
     }
 }
 
+/** @noinspection PhpUndefinedVariableInspection */
 $user = User::all()->where('id', $data[0])->first();
 ?>
 
@@ -63,7 +65,7 @@ $user = User::all()->where('id', $data[0])->first();
                         <?php
                         foreach (Role::all() as $role): ?>
                             <option value="<?= $role->id ?>" <?=
-                            (int)$_SESSION['role'] === (int)$role->id ? 'selected' : ''
+                            (new User())->getRoleByUserId($data[0]) === (int)$role->id ? 'selected' : ''
                             ?>><?= $role->name ?></option>
                         <?php
                         endforeach; ?>
@@ -77,7 +79,7 @@ $user = User::all()->where('id', $data[0])->first();
                            class="checkbox"
                            id="subscribe"
                         <?php
-                        if ((bool)$user->subscribe): ?>
+                        if (Subscribe::all()->where('mail', $user->mail)->first() !== null): ?>
                             checked
                         <?php
                         endif; ?>>

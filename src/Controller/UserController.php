@@ -7,17 +7,19 @@ use App\Exception\SaveException;
 use App\Mail;
 use App\Model\User;
 use App\Session;
+use App\Traits\UploadImage;
 
 class UserController
 {
+    use UploadImage;
+
     /**
      * Редактирование профиля в личном кабинете
      * @param string $login
-     * @return bool
      * @throws DataException
      * @throws SaveException
      */
-    public function minEdit(string $login): bool
+    public function minEdit(string $login): void
     {
         $user = User::all()->where('login', $login)->first();
 
@@ -41,28 +43,30 @@ class UserController
         if (!$success) {
             throw new SaveException('Ошибка сохранения данных', 500);
         }
-
-        return true;
     }
 
     /**
      * Загружает аватар пользователя
      * @param $login
-     * @return bool
-     * @throws SaveException
+     * @return void
      * @throws DataException
+     * @throws SaveException
      */
-    public function uploadAvatar($login): bool
+    public function uploadAvatar($login): void
     {
-        if (isset($_FILES['image']) && $_FILES['image']['error'] === 0) {
-            if ($_FILES['image']['size'] > AVATAR_MAX_SIZE_B) {
+        if (isset($_FILES['image'])) {
+            if ($_FILES['image']['error'] === 4) {
+                throw new DataException(['image' => 'Не выбрано изображение']);
+            } elseif ($_FILES['image']['error'] !== 0) {
+                throw new DataException(['image' => 'Непредвиденная ошибка']);
+            } elseif ($_FILES['image']['size'] > AVATAR_MAX_SIZE_B) {
                 throw new DataException(['image' => 'Максимальный размер изображения ' . AVATAR_MAX_SIZE . 'мб']);
             } elseif (!in_array(mime_content_type($_FILES['image']['tmp_name']), ALLOWED_IMAGES)) {
                 throw new DataException(['image' => 'Недопустимое расширение файла']);
             }
         }
 
-        $image = $this->uploadImage($_FILES['image'], $login);
+        $image = $this->uploadImage($_FILES['image'], $login, AVATAR_UPLOAD_DIR);
 
         $user = User::all()->where('login', $login)->first();
         $user->setAvatar($image);
@@ -71,16 +75,13 @@ class UserController
         if (!$success) {
             throw new SaveException('Ошибка сохранения данных', 500);
         }
-
-        return true;
     }
 
     /**
      * Выполняет вход в аккаунт
-     * @return bool
      * @throws DataException
      */
-    public function auth(): bool
+    public function auth(): void
     {
         if ($this->verifyAuthData()) {
             $user = User::all()
@@ -102,7 +103,6 @@ class UserController
             }
 
             redirectOnPage();
-            return true;
         } else {
             throw new DataException(['auth' => 'Не правильный логин или пароль']);
         }
@@ -110,10 +110,9 @@ class UserController
 
     /**
      * Регистрирует пользователя
-     * @return bool
      * @throws DataException
      */
-    public function registration(): bool
+    public function registration(): void
     {
         $error = $this->checkData();
 
@@ -128,8 +127,6 @@ class UserController
         $_SESSION['mail'] = $_POST['email'];
         $_SESSION['login'] = $_POST['username'];
         $_SESSION['password'] = $_POST['password'];
-
-        return true;
     }
 
     /**
@@ -154,7 +151,7 @@ class UserController
     /**
      * Генерирует и отправляет новый код
      */
-    public function newCode()
+    public function newCode(): void
     {
         if (isset($_SESSION['mail']) && $_SESSION['login']) {
             $this->writeCode($_SESSION['mail'], $_SESSION['login']);
@@ -171,10 +168,9 @@ class UserController
 
     /**
      * Проверяет код из письма
-     * @return bool
      * @throws DataException
      */
-    public function checkCode(): bool
+    public function checkCode(): void
     {
         if (isset($_SESSION['secret_code']) && isset($_SESSION['secret_code_time'])) {
             if (!isSessionLive()) {
@@ -184,8 +180,6 @@ class UserController
             }
             $this->create();
         }
-
-        return true;
     }
 
     /**
@@ -207,9 +201,8 @@ class UserController
 
     /**
      * Сбрасывает пароль
-     * @return bool
      */
-    public function resetPassword(): bool
+    public function resetPassword(): void
     {
         $password = $this->checkPassword($_POST['new_password']);
         if ($password === null) {
@@ -230,18 +223,16 @@ class UserController
 
             unset($_SESSION['forgetting_user']);
         }
-
-        return true;
     }
 
     /**
      * Устанавливает новые значения для пользователя
      * @param int $userId - id пользователя
-     * @return bool
+     * @return void
      * @throws DataException
      * @throws SaveException
      */
-    public function setNewData(int $userId): bool
+    public function setNewData(int $userId): void
     {
         $user = User::all()->where('id', $userId)->first();
 
@@ -251,8 +242,8 @@ class UserController
             throw new DataException($error);
         }
 
-        if ($_SESSION['login'] === $user->login) {
-            $_SESSION['login'] = trim($_POST['login']);
+        if ($userId === (new User)->getThisUserId() && $_SESSION['login'] !== $_POST['username']) {
+            $_SESSION['login'] = trim($_POST['username']);
         }
 
         $user->setName($_POST['name'])
@@ -267,8 +258,6 @@ class UserController
         }
 
         header('Refresh: 0');
-
-        return true;
     }
 
     /**
@@ -361,35 +350,6 @@ class UserController
 
         $_SESSION['secret_code'] = $code;
         $_SESSION['secret_code_time'] = time();
-    }
-
-    /**
-     * Загружает изображение на сервер и возвращает путь к загруженной картинке
-     * @param $image
-     * @param $name
-     * @return string
-     */
-    private function uploadImage(array $image, string $name): string
-    {
-        if (!file_exists(IMAGE_DIR)) {
-            mkdir(IMAGE_DIR);
-        }
-
-        if (!file_exists(AVATAR_UPLOAD_DIR)) {
-            mkdir(AVATAR_UPLOAD_DIR);
-        }
-
-        $partsName = explode('.', $image['name']);
-        $format = $partsName[array_key_last($partsName)];
-        $name .= '.' . $format;
-
-        if (in_array($name, scandir(AVATAR_UPLOAD_DIR))) {
-            unlink(AVATAR_UPLOAD_DIR . $name);
-        }
-
-        move_uploaded_file($image['tmp_name'], AVATAR_UPLOAD_DIR . $name);
-
-        return AVATAR_PATH . $name;
     }
 
     /**

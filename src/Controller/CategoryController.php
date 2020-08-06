@@ -42,11 +42,10 @@ class CategoryController extends PageController
     /**
      * Изменение категории
      * @param int $id
-     * @return bool
      * @throws SaveException
      * @throws DataException
      */
-    public function changeCategory(int $id): bool
+    public function changeCategory(int $id): void
     {
         $name = mb_ucfirst(trim($_POST['name']));
 
@@ -66,7 +65,7 @@ class CategoryController extends PageController
             throw new SaveException('Ошибка сохранения данных', 500);
         }
 
-        return true;
+        redirectOnPage($_SERVER['REQUEST_URI']);
     }
 
     /**

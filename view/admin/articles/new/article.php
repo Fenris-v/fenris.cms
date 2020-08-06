@@ -7,7 +7,7 @@ use App\Model\Category;
 
 if (!empty($_POST)) {
     try {
-        $success = (new ArticleController())->addArticle();
+        (new ArticleController())->addArticle();
     } catch (DataException $exception) { ?>
         <span class="text-danger"><?= $exception->getMessage() ?></span>
         <?php
@@ -15,13 +15,6 @@ if (!empty($_POST)) {
         <span class="text-danger"><?= $exception->getMessage() . ' - ' . $exception->getCode() ?></span>
         <?php
     }
-
-    if ($success): ?>
-        <script>
-            window.location.href = window.location.origin + '/admin/articles'
-        </script>
-    <?php
-    endif;
 } ?>
 
 <div class="row">

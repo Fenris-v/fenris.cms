@@ -17,15 +17,15 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/bootstrap.php';
 $session = new Session();
 $session->start();
 
+if ($_SERVER['REQUEST_URI'] === '/auth' && isset($_SESSION['login'])) {
+    $session->destroy();
+}
+
 if (isset($_GET['logout'])) {
     $session->destroy();
 
     $_COOKIE['password_token'] = null;
     setcookie('password_token', null, time() - 3600, '/');
-
-    if (isset($_SERVER['HTTP_REFERER']) && $_SERVER['HTTP_REFERER']) {
-        redirectOnPage($_SERVER['HTTP_REFERER']);
-    }
 
     redirectOnPage();
 }
