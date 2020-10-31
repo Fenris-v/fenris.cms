@@ -10,7 +10,7 @@ if (isset($data[0])) {
         ->where('category_id', $category->id)
         ->take(2);
 } else {
-    $articles = Article::all()->where('top', 1)->take(2);
+    $articles = Article::all()->where('top', 1)->sortByDesc('created_at')->take(2);
     $categories = (new Category())::all();
 } ?>
 

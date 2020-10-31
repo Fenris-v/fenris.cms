@@ -141,7 +141,7 @@ final class User extends Model
      * @param int $id
      * @return int
      */
-    public function getRoleName(int $id): int
+    public function getRoleName(int $id): string
     {
         return (new Role())->getRoleVisibleName(
             $this::all()
